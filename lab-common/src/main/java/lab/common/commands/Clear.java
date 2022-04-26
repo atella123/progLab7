@@ -1,14 +1,15 @@
 package lab.common.commands;
 
-import lab.common.data.PersonCollectionManager;
+import lab.common.data.DataManager;
+import lab.common.data.Person;
 
-public final class Clear extends CollectionCommand {
+public final class Clear extends AbstractDataCommand {
 
     public Clear() {
         super();
     }
 
-    public Clear(PersonCollectionManager manager) {
+    public Clear(DataManager<Person> manager) {
         super(manager);
     }
 

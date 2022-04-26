@@ -2,16 +2,16 @@ package lab.common.commands;
 
 import java.util.Optional;
 
+import lab.common.data.DataManager;
 import lab.common.data.Person;
-import lab.common.data.PersonCollectionManager;
 
-public final class MinByCoordinates extends CollectionCommand {
+public final class MinByCoordinates extends AbstractDataCommand {
 
     public MinByCoordinates() {
         super();
     }
 
-    public MinByCoordinates(PersonCollectionManager manager) {
+    public MinByCoordinates(DataManager<Person> manager) {
         super(manager);
     }
 

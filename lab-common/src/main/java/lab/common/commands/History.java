@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 
 import lab.common.util.CommandRunner;
 
-public final class History extends Command {
+public final class History extends AbstractCommand {
 
     private CommandRunner<?, ?> commands;
 

@@ -13,7 +13,7 @@ import lab.commands.ExecuteScript;
 import lab.common.commands.Add;
 import lab.common.commands.AddIfMax;
 import lab.common.commands.Clear;
-import lab.common.commands.Command;
+import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.Exit;
 import lab.common.commands.FilterLessThanNationality;
@@ -167,15 +167,15 @@ public final class Client {
         return serverAdress;
     }
 
-    public static Map<String, Command> createCommands(CommandRunner<String, ?> commandRunner) {
-        HashMap<String, Command> commands = new HashMap<>();
+    public static Map<String, AbstractCommand> createCommands(CommandRunner<String, ?> commandRunner) {
+        HashMap<String, AbstractCommand> commands = new HashMap<>();
         commands.put("exit", new Exit());
         commands.put("execute_script", new ExecuteScript(commandRunner));
         return commands;
     }
 
-    public static Map<String, Command> createServerCommandsMap() {
-        HashMap<String, Command> commands = new HashMap<>();
+    public static Map<String, AbstractCommand> createServerCommandsMap() {
+        HashMap<String, AbstractCommand> commands = new HashMap<>();
         commands.put("help", new Help());
         commands.put("info", new Info());
         commands.put("show", new Show());

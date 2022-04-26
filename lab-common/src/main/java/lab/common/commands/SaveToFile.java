@@ -6,9 +6,10 @@ import java.io.IOException;
 
 import com.google.gson.Gson;
 
-import lab.common.data.PersonCollectionManager;
+import lab.common.data.DataManager;
+import lab.common.data.Person;
 
-public final class SaveToFile extends Save {
+public final class SaveToFile extends AbstractSaveCommand {
 
     private Gson gson;
     private final File file;
@@ -18,7 +19,7 @@ public final class SaveToFile extends Save {
         file = null;
     }
 
-    public SaveToFile(PersonCollectionManager manager, Gson gson, File file) {
+    public SaveToFile(DataManager<Person> manager, Gson gson, File file) {
         super(manager);
         this.gson = gson;
         this.file = file;

@@ -1,15 +1,15 @@
 package lab.common.commands;
 
+import lab.common.data.DataManager;
 import lab.common.data.Person;
-import lab.common.data.PersonCollectionManager;
 
-public final class RemoveGreater extends CollectionCommand {
+public final class RemoveGreater extends AbstractDataCommand {
 
     public RemoveGreater() {
         super();
     }
 
-    public RemoveGreater(PersonCollectionManager manager) {
+    public RemoveGreater(DataManager<Person> manager) {
         super(manager);
     }
 

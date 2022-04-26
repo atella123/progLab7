@@ -1,14 +1,15 @@
 package lab.common.commands;
 
-import lab.common.data.PersonCollectionManager;
+import lab.common.data.DataManager;
+import lab.common.data.Person;
 
-public final class RemoveByID extends CollectionCommand {
+public final class RemoveByID extends AbstractDataCommand {
 
     public RemoveByID() {
         super();
     }
 
-    public RemoveByID(PersonCollectionManager manager) {
+    public RemoveByID(DataManager<Person> manager) {
         super(manager);
     }
 

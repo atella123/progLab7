@@ -3,16 +3,16 @@ package lab.common.commands;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lab.common.data.DataManager;
 import lab.common.data.Person;
-import lab.common.data.PersonCollectionManager;
 
-public final class GroupCountingByPassportID extends CollectionCommand {
+public final class GroupCountingByPassportID extends AbstractDataCommand {
 
     public GroupCountingByPassportID() {
         super();
     }
 
-    public GroupCountingByPassportID(PersonCollectionManager manager) {
+    public GroupCountingByPassportID(DataManager<Person> manager) {
         super(manager);
     }
 

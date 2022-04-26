@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
-import lab.common.commands.Command;
+import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.io.IOManager;
@@ -17,7 +17,7 @@ public abstract class CommandRunner<R, C> {
     private static final int HISTORY_SIZE = 11;
     private IOManager<R, CommandResponse> io;
     private final CommandManager<C> commandManager;
-    private final ArrayList<Command> history = new ArrayList<>(HISTORY_SIZE);
+    private final ArrayList<AbstractCommand> history = new ArrayList<>(HISTORY_SIZE);
     private final ArgumentParser<Object> argumentParser;
 
     public CommandRunner(CommandManager<C> commandManager, ArgumentParser<Object> argumentParser,
@@ -27,7 +27,7 @@ public abstract class CommandRunner<R, C> {
         this.io = io;
     }
 
-    public abstract Command parseCommand(R arg);
+    public abstract AbstractCommand parseCommand(R arg);
 
     public abstract Object[] parseArgumentsFromReadedObject(R arg);
 
@@ -53,7 +53,7 @@ public abstract class CommandRunner<R, C> {
     }
 
     public CommandResponse runCommand(R commandWithArgs) {
-        Command command = parseCommand(commandWithArgs);
+        AbstractCommand command = parseCommand(commandWithArgs);
         if (Objects.nonNull(command)) {
             Object[] arguments = parseArguments(command, parseArgumentsFromReadedObject(commandWithArgs));
             return runCommand(command, arguments);
@@ -61,7 +61,7 @@ public abstract class CommandRunner<R, C> {
         return new CommandResponse(CommandResult.COMMAND_NOT_FOUND, "Unknown command");
     }
 
-    public CommandResponse runCommand(Command cmd, Object... args) {
+    public CommandResponse runCommand(AbstractCommand cmd, Object... args) {
         if (history.size() >= HISTORY_SIZE) {
             history.remove(0);
         }
@@ -69,7 +69,7 @@ public abstract class CommandRunner<R, C> {
         return cmd.execute(args);
     }
 
-    public Object[] parseArguments(Command command, Object[] argumentsToParse) {
+    public Object[] parseArguments(AbstractCommand command, Object[] argumentsToParse) {
         Class<?>[] argumentClasses = command.getArgumentClasses();
         ArrayList<Object> arguments = new ArrayList<>(argumentClasses.length);
         arguments.addAll(Arrays.asList(argumentsToParse));
@@ -86,7 +86,7 @@ public abstract class CommandRunner<R, C> {
         return arguments.toArray();
     }
 
-    public Collection<Command> getHistory() {
+    public Collection<AbstractCommand> getHistory() {
         return history;
     }
 

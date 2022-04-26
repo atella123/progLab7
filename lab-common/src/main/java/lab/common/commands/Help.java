@@ -3,15 +3,15 @@ package lab.common.commands;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public final class Help extends Command {
+public final class Help extends AbstractCommand {
 
-    private Collection<Command> commands;
+    private Collection<AbstractCommand> commands;
 
     public Help() {
         super();
     }
 
-    public Help(Collection<Command> commands) {
+    public Help(Collection<AbstractCommand> commands) {
         super(true);
         this.commands = commands;
     }
@@ -22,7 +22,7 @@ public final class Help extends Command {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
         return new CommandResponse(CommandResult.SUCCESS,
-                commands.stream().map(Command::getMan).collect(Collectors.joining("\n")));
+                commands.stream().map(AbstractCommand::getMan).collect(Collectors.joining("\n")));
     }
 
     @Override

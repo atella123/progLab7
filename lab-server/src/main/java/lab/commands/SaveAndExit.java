@@ -1,20 +1,20 @@
 package lab.commands;
 
-import lab.common.commands.Command;
+import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.commands.Save;
+import lab.common.commands.AbstractSaveCommand;
 
-public class SaveAndExit extends Command {
+public class SaveAndExit extends AbstractCommand {
 
-    private final Save saveCommand;
+    private final AbstractSaveCommand saveCommand;
 
     public SaveAndExit() {
         super();
         this.saveCommand = null;
     }
 
-    public SaveAndExit(Save saveCommand) {
+    public SaveAndExit(AbstractSaveCommand saveCommand) {
         super(true);
         this.saveCommand = saveCommand;
     }

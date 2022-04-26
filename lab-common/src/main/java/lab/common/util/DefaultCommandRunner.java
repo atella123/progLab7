@@ -2,7 +2,7 @@ package lab.common.util;
 
 import java.util.Arrays;
 
-import lab.common.commands.Command;
+import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.io.IOManager;
 
@@ -14,7 +14,7 @@ public class DefaultCommandRunner extends CommandRunner<String, String> {
     }
 
     @Override
-    public Command parseCommand(String arg) {
+    public AbstractCommand parseCommand(String arg) {
         return getCommandManager().get(arg.split("\\s+")[0].trim());
     }
 

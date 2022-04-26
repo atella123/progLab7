@@ -6,13 +6,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Stack;
 
-import lab.common.commands.Command;
+import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.util.CommandRunner;
 import lab.common.io.Reader;
 
-public final class ExecuteScript extends Command {
+public final class ExecuteScript extends AbstractCommand {
 
     private final CommandRunner<String, ?> runner;
     private final Stack<File> bannedFiles = new Stack<>();

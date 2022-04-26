@@ -1,14 +1,14 @@
 package lab.common.commands;
 
-public abstract class Command {
+public abstract class AbstractCommand {
 
     protected final boolean isExecutableInstance;
 
-    public Command() {
+    public AbstractCommand() {
         isExecutableInstance = false;
     }
 
-    protected Command(boolean isExecutableInstance) {
+    protected AbstractCommand(boolean isExecutableInstance) {
         this.isExecutableInstance = isExecutableInstance;
     }
 

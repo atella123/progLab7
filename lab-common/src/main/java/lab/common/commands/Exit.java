@@ -1,6 +1,6 @@
 package lab.common.commands;
 
-public final class Exit extends Command {
+public final class Exit extends AbstractCommand {
 
     public Exit() {
         super(true);

@@ -2,16 +2,16 @@ package lab.common.commands;
 
 import java.util.Optional;
 
+import lab.common.data.DataManager;
 import lab.common.data.Person;
-import lab.common.data.PersonCollectionManager;
 
-public final class Update extends CollectionCommand {
+public final class Update extends AbstractDataCommand {
 
     public Update() {
         super();
     }
 
-    public Update(PersonCollectionManager manager) {
+    public Update(DataManager<Person> manager) {
         super(manager);
     }
 

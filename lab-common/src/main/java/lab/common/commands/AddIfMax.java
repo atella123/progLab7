@@ -1,15 +1,15 @@
 package lab.common.commands;
 
+import lab.common.data.DataManager;
 import lab.common.data.Person;
-import lab.common.data.PersonCollectionManager;
 
-public final class AddIfMax extends CollectionCommand {
+public final class AddIfMax extends AbstractDataCommand {
 
     public AddIfMax() {
         super();
     }
 
-    public AddIfMax(PersonCollectionManager manager) {
+    public AddIfMax(DataManager<Person> manager) {
         super(manager);
     }
 

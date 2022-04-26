@@ -1,15 +1,15 @@
 package lab.common.commands;
 
+import lab.common.data.DataManager;
 import lab.common.data.Person;
-import lab.common.data.PersonCollectionManager;
 
-public final class Add extends CollectionCommand {
+public final class Add extends AbstractDataCommand {
 
     public Add() {
         super();
     }
 
-    public Add(PersonCollectionManager manager) {
+    public Add(DataManager<Person> manager) {
         super(manager);
     }
 

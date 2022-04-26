@@ -3,15 +3,16 @@ package lab.common.commands;
 import java.util.stream.Collectors;
 
 import lab.common.data.Country;
-import lab.common.data.PersonCollectionManager;
+import lab.common.data.DataManager;
+import lab.common.data.Person;
 
-public final class FilterLessThanNationality extends CollectionCommand {
+public final class FilterLessThanNationality extends AbstractDataCommand {
 
     public FilterLessThanNationality() {
         super();
     }
 
-    public FilterLessThanNationality(PersonCollectionManager manager) {
+    public FilterLessThanNationality(DataManager<Person> manager) {
         super(manager);
     }
 

@@ -2,7 +2,7 @@ package lab.commands;
 
 import java.util.Arrays;
 
-import lab.common.commands.Command;
+import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.util.CommandManager;
@@ -10,7 +10,7 @@ import lab.common.util.CommandRunner;
 import lab.common.util.CommandWithArguments;
 import lab.io.DatagramSocketIOManager;
 
-public final class RequestServer<R, C> extends Command {
+public final class RequestServer<R, C> extends AbstractCommand {
 
     private final DatagramSocketIOManager io;
     private final CommandRunner<R, C> toServerCommandRunner;
@@ -29,7 +29,7 @@ public final class RequestServer<R, C> extends Command {
         if (!toServerCommandRunner.getCommandManager().containsKey(args[0])) {
             return new CommandResponse(CommandResult.ERROR, "Unknown command");
         }
-        Command command = toServerCommandRunner.getCommandManager().get(args[0]);
+        AbstractCommand command = toServerCommandRunner.getCommandManager().get(args[0]);
         Object[] parsedArgs = toServerCommandRunner.parseArguments(command, Arrays.copyOfRange(args, 1, args.length));
         if (!command.isVaildArgument(parsedArgs)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");

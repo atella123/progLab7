@@ -2,17 +2,16 @@ package lab.common.commands;
 
 import lab.common.data.DataManager;
 import lab.common.data.Person;
-import lab.common.data.PersonCollectionManager;
 
-public abstract class CollectionCommand extends Command {
+public abstract class AbstractDataCommand extends AbstractCommand {
 
     private DataManager<Person> manager;
 
-    public CollectionCommand() {
+    public AbstractDataCommand() {
         super();
     }
 
-    public CollectionCommand(DataManager<Person> manager) {
+    public AbstractDataCommand(DataManager<Person> manager) {
         super(true);
         this.manager = manager;
     }
@@ -26,7 +25,7 @@ public abstract class CollectionCommand extends Command {
         return manager;
     }
 
-    public void setManager(PersonCollectionManager manager) {
+    public void setManager(DataManager<Person> manager) {
         this.manager = manager;
     }
 
@@ -49,7 +48,7 @@ public abstract class CollectionCommand extends Command {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        CollectionCommand other = (CollectionCommand) obj;
+        AbstractDataCommand other = (AbstractDataCommand) obj;
         if (manager == null) {
             return other.manager == null;
         }

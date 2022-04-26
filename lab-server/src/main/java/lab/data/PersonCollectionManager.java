@@ -1,4 +1,4 @@
-package lab.common.data;
+package lab.data;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import lab.common.data.DataManager;
+import lab.common.data.Person;
 
 public class PersonCollectionManager implements DataManager<Person> {
 

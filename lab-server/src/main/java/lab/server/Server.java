@@ -20,7 +20,7 @@ import lab.commands.SaveAndExit;
 import lab.common.commands.Add;
 import lab.common.commands.AddIfMax;
 import lab.common.commands.Clear;
-import lab.common.commands.Command;
+import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.FilterLessThanNationality;
 import lab.common.commands.GroupCountingByPassportID;
@@ -34,13 +34,13 @@ import lab.common.commands.SaveToFile;
 import lab.common.commands.Show;
 import lab.common.commands.Update;
 import lab.common.data.Person;
-import lab.common.data.PersonCollectionManager;
 import lab.common.io.IOManager;
 import lab.common.json.DefalutGsonCreator;
 import lab.common.util.ArgumentParser;
 import lab.common.util.CommandManager;
 import lab.common.util.CommandRunner;
 import lab.common.util.DefaultCommandRunner;
+import lab.data.PersonCollectionManager;
 import lab.io.DatagramChannelIOManager;
 import lab.util.PersonCollectionServer;
 import lab.util.ServerToClientCommandRunner;
@@ -65,7 +65,7 @@ public final class Server {
         Gson gson = DefalutGsonCreator.createGson();
         Collection<Person> collection = readCollectionFromFile(file, gson);
         PersonCollectionManager manager = new PersonCollectionManager(collection);
-        CommandManager<Class<? extends Command>> clientCommandManager = new CommandManager<>();
+        CommandManager<Class<? extends AbstractCommand>> clientCommandManager = new CommandManager<>();
         ServerToClientCommandRunner clientCommandRunner;
         try {
             clientCommandRunner = new ServerToClientCommandRunner(clientCommandManager,
@@ -107,9 +107,10 @@ public final class Server {
         return new HashSet<>();
     }
 
-    public static Map<Class<? extends Command>, Command> createClientCommandsMap(PersonCollectionManager manager,
+    public static Map<Class<? extends AbstractCommand>, AbstractCommand> createClientCommandsMap(
+            PersonCollectionManager manager,
             ServerToClientCommandRunner runner) {
-        HashMap<Class<? extends Command>, Command> commands = new HashMap<>();
+        HashMap<Class<? extends AbstractCommand>, AbstractCommand> commands = new HashMap<>();
         commands.put(Help.class, new Help(commands.values()));
         commands.put(Info.class, new Info(manager));
         commands.put(Show.class, new Show(manager));
@@ -126,8 +127,9 @@ public final class Server {
         return commands;
     }
 
-    public static Map<String, Command> createServerCommandsMap(PersonCollectionManager manager, Gson gson, File file) {
-        HashMap<String, Command> commands = new HashMap<>();
+    public static Map<String, AbstractCommand> createServerCommandsMap(PersonCollectionManager manager, Gson gson,
+            File file) {
+        HashMap<String, AbstractCommand> commands = new HashMap<>();
         SaveToFile saveCommand = new SaveToFile(manager, gson, file);
         commands.put("save", saveCommand);
         commands.put("exit", new SaveAndExit(saveCommand));

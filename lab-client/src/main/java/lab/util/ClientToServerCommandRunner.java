@@ -5,7 +5,7 @@ import java.net.SocketException;
 import java.util.Arrays;
 
 import lab.commands.RequestServer;
-import lab.common.commands.Command;
+import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.io.IOManager;
 import lab.common.util.ArgumentParser;
@@ -28,7 +28,7 @@ public class ClientToServerCommandRunner extends CommandRunner<String, String> {
 
     @Override
     @SuppressWarnings("unckeched")
-    public Command parseCommand(String arg) {
+    public AbstractCommand parseCommand(String arg) {
         String cmd = arg.trim().split("\\s+")[0];
         return getCommandManager().getOrDefault(cmd, requestCommand);
     }
@@ -44,7 +44,7 @@ public class ClientToServerCommandRunner extends CommandRunner<String, String> {
 
     public static ArgumentParser<Object> createRunnerArgumentParser(CommandManager<String> serverCommands) {
         ArgumentParser<Object> argumentParser = new ArgumentParser<>();
-        argumentParser.add(Command.class, serverCommands::get);
+        argumentParser.add(AbstractCommand.class, serverCommands::get);
         return argumentParser;
     }
 
