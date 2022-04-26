@@ -13,9 +13,9 @@ public class Person implements Comparable<Person>, Serializable {
                         // автоматически
     private String name; // Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; // Поле не может быть null
-    private java.time.LocalDate creationDate; // Поле не может быть null, Значение этого поля должно
-                                              // генерироваться
-                                              // автоматически
+    private LocalDate creationDate; // Поле не может быть null, Значение этого поля должно
+                                    // генерироваться
+                                    // автоматически
     private int height; // Значение поля должно быть больше 0
     private String passportID; // Длина строки должна быть не меньше 10, Поле может быть null
     private Color eyeColor; // Поле может быть null

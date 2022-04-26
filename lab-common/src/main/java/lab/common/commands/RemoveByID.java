@@ -1,8 +1,5 @@
 package lab.common.commands;
 
-import java.util.Optional;
-
-import lab.common.data.Person;
 import lab.common.data.PersonCollectionManager;
 
 public final class RemoveByID extends CollectionCommand {
@@ -24,8 +21,7 @@ public final class RemoveByID extends CollectionCommand {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         Integer id = (Integer) args[0];
-        Optional<Person> person = getManager().removePersonByID(id);
-        if (person.isPresent()) {
+        if (getManager().removeByID(id)) {
             return new CommandResponse(CommandResult.SUCCESS);
         }
         return new CommandResponse(CommandResult.ERROR, "No such element");

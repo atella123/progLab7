@@ -20,7 +20,7 @@ public final class Show extends CollectionCommand {
         }
 
         return new CommandResponse(CommandResult.SUCCESS, "Person manager elements:",
-                getManager().getCollection().toArray(new Person[0]));
+                getManager().getAsCollection().toArray(new Person[0]));
     }
 
     @Override

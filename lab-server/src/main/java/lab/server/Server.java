@@ -30,7 +30,7 @@ import lab.common.commands.Info;
 import lab.common.commands.MinByCoordinates;
 import lab.common.commands.RemoveByID;
 import lab.common.commands.RemoveGreater;
-import lab.common.commands.Save;
+import lab.common.commands.SaveToFile;
 import lab.common.commands.Show;
 import lab.common.commands.Update;
 import lab.common.data.Person;
@@ -128,7 +128,7 @@ public final class Server {
 
     public static Map<String, Command> createServerCommandsMap(PersonCollectionManager manager, Gson gson, File file) {
         HashMap<String, Command> commands = new HashMap<>();
-        Save saveCommand = new Save(manager, gson, file);
+        SaveToFile saveCommand = new SaveToFile(manager, gson, file);
         commands.put("save", saveCommand);
         commands.put("exit", new SaveAndExit(saveCommand));
         return commands;

@@ -19,11 +19,11 @@ public final class Info extends CollectionCommand {
         }
         return new CommandResponse(CommandResult.SUCCESS, new StringBuilder()
                 .append("Collection type: ")
-                .append(getManager().getCollectionType())
+                .append(getManager().getDataSourceType())
                 .append("\nInit date: ")
                 .append(getManager().getInitDate().toString())
                 .append("\nElement count: ")
-                .append(getManager().getCollection().size())
+                .append(getManager().getAsCollection().size())
                 .toString());
     }
 

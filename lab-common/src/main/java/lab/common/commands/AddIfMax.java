@@ -22,7 +22,7 @@ public final class AddIfMax extends CollectionCommand {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         Person p = (Person) args[0];
-        getManager().addIfAllMatch(p, person -> person.compareTo(p) < 0);
+        getManager().addIfMax(p);
         return new CommandResponse(CommandResult.SUCCESS);
     }
 

@@ -25,7 +25,7 @@ public final class FilterLessThanNationality extends CollectionCommand {
         }
         Country country = (Country) args[0];
         return new CommandResponse(CommandResult.SUCCESS,
-                getManager().filter(person -> person.getNationality().compareTo(country) < 0)
+                getManager().getAsCollection().stream().filter(person -> person.getNationality().compareTo(country) < 0)
                         .map(Object::toString).collect(Collectors.joining("\n")));
     }
 

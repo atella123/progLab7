@@ -21,7 +21,8 @@ public final class MinByCoordinates extends CollectionCommand {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
         Optional<Person> minPerson = getManager()
-                .getMinPerson((person1, person2) -> person1.getCoordinates().compareTo(person2.getCoordinates()));
+                .getAsCollection().stream()
+                .min((person1, person2) -> person1.getCoordinates().compareTo(person2.getCoordinates()));
         if (minPerson.isPresent()) {
             return new CommandResponse(CommandResult.SUCCESS, minPerson.get().toString());
         }

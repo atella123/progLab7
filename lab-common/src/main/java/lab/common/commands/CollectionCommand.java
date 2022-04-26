@@ -1,16 +1,18 @@
 package lab.common.commands;
 
+import lab.common.data.DataManager;
+import lab.common.data.Person;
 import lab.common.data.PersonCollectionManager;
 
 public abstract class CollectionCommand extends Command {
 
-    private PersonCollectionManager manager;
+    private DataManager<Person> manager;
 
     public CollectionCommand() {
         super();
     }
 
-    public CollectionCommand(PersonCollectionManager manager) {
+    public CollectionCommand(DataManager<Person> manager) {
         super(true);
         this.manager = manager;
     }
@@ -20,7 +22,7 @@ public abstract class CollectionCommand extends Command {
         return "CollectionCommand";
     }
 
-    public PersonCollectionManager getManager() {
+    public DataManager<Person> getManager() {
         return manager;
     }
 

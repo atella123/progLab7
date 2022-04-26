@@ -21,7 +21,8 @@ public final class GroupCountingByPassportID extends CollectionCommand {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
-        Map<String, Long> groupCounting = getManager().groupCounting(Person::getPassportID);
+        Map<String, Long> groupCounting = getManager().getAsCollection().stream()
+                .collect(Collectors.groupingBy(Person::getPassportID, Collectors.counting()));
         return new CommandResponse(CommandResult.SUCCESS,
                 groupCounting.entrySet().stream()
                         .map(Object::toString)

@@ -24,9 +24,9 @@ public final class Update extends CollectionCommand {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         Integer id = (Integer) args[0];
-        Optional<Person> personToUpdate = getManager().getPersonByID(id);
+        Optional<Person> personToUpdate = getManager().getByID(id);
         if (personToUpdate.isPresent()) {
-            getManager().updatePerson(personToUpdate.get(), (Person) args[1]);
+            getManager().updateID(personToUpdate.get().getID(), (Person) args[1]);
             return new CommandResponse(CommandResult.SUCCESS);
         }
         return new CommandResponse(CommandResult.ERROR, "No element with id (" + id + ") is present");
