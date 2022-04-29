@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import lab.common.data.DataManager;
@@ -29,21 +30,27 @@ public class PersonCollectionManager implements DataManager<Person> {
     }
 
     @Override
-    public void add(Person person) {
+    public boolean allMatches(Predicate<Person> predicate) {
+        return collection.stream().allMatch(predicate);
+    }
+
+    @Override
+    public boolean add(Person person) {
         if (idSet.contains(person.getID())) {
             person.setID(idSet.last() + 1);
         }
         idSet.add(person.getID());
         this.collection.add(person);
+        return true;
     }
 
     @Override
-    public boolean addIfMax(Person person) {
-        if (collection.stream().min((p1, p2) -> p1.compareTo(p2)).isPresent()) {
-            collection.add(person);
-            return true;
+    public boolean addIfAllMatches(Person person, Predicate<Person> predicate) {
+        if (!allMatches(predicate)) {
+            return false;
         }
-        return false;
+        collection.add(person);
+        return true;
     }
 
     @Override
@@ -53,18 +60,37 @@ public class PersonCollectionManager implements DataManager<Person> {
     }
 
     @Override
+    public void removeAll(Collection<Person> collectionToRemove) {
+        collection.removeAll(collectionToRemove);
+    }
+
+    @Override
     public boolean removeByID(int id) {
         return collection.removeIf(p -> p.getID() == id);
     }
 
     @Override
-    public void removeGreater(Person person) {
-        collection.removeIf(p -> p.compareTo(person) > 0);
+    public void removeMatches(Predicate<Person> predicate) {
+        collection.removeIf(predicate);
+    }
+
+    @Override
+    public boolean removeIfAllMatches(Person person, Predicate<Person> predicate) {
+        if (!allMatches(predicate)) {
+            return false;
+        }
+        collection.remove(person);
+        return true;
     }
 
     @Override
     public Optional<Person> getByID(int id) {
         return collection.stream().filter(p -> p.getID().equals(id)).findFirst();
+    }
+
+    @Override
+    public Collection<Person> getMatches(Predicate<Person> predicate) {
+        return collection.stream().filter(predicate).collect(Collectors.toSet());
     }
 
     @Override
@@ -99,5 +125,4 @@ public class PersonCollectionManager implements DataManager<Person> {
     public String getDataSourceType() {
         return "java.util.HashSet";
     }
-
 }

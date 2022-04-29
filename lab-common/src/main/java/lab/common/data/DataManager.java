@@ -3,28 +3,37 @@ package lab.common.data;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public interface DataManager<T> {
 
-    public void add(T t);
+    boolean allMatches(Predicate<T> predicate);
 
-    public boolean addIfMax(T t);
+    boolean add(T t);
 
-    public void remove(T t);
+    boolean addIfAllMatches(T t, Predicate<T> predicate);
 
-    public boolean removeByID(int id);
+    void remove(T t);
 
-    public void removeGreater(T t);
+    void removeAll(Collection<T> t);
 
-    public Optional<Person> getByID(int id);
+    boolean removeByID(int id);
 
-    public Collection<T> getAsCollection();
+    void removeMatches(Predicate<T> predicate);
 
-    public boolean updateID(int id, T t);
+    boolean removeIfAllMatches(T t, Predicate<T> predicate);
 
-    public void clear();
+    Optional<Person> getByID(int id);
 
-    public LocalDate getInitDate();
+    Collection<T> getMatches(Predicate<T> predicate);
 
-    public String getDataSourceType();
+    boolean updateID(int id, T t);
+
+    Collection<T> getAsCollection();
+
+    void clear();
+
+    LocalDate getInitDate();
+
+    String getDataSourceType();
 }

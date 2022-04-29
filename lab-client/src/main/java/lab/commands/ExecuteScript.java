@@ -11,6 +11,7 @@ import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.util.CommandRunner;
 import lab.common.io.Reader;
+import lab.common.users.User;
 
 public final class ExecuteScript extends AbstractCommand {
 
@@ -29,7 +30,7 @@ public final class ExecuteScript extends AbstractCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }

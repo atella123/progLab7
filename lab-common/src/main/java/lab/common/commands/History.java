@@ -2,6 +2,7 @@ package lab.common.commands;
 
 import java.util.stream.Collectors;
 
+import lab.common.users.User;
 import lab.common.util.CommandRunner;
 
 public final class History extends AbstractCommand {
@@ -18,7 +19,7 @@ public final class History extends AbstractCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }

@@ -8,8 +8,9 @@ import com.google.gson.Gson;
 
 import lab.common.data.DataManager;
 import lab.common.data.Person;
+import lab.common.users.User;
 
-public final class SaveToFile extends AbstractSaveCommand {
+public final class SaveToFile extends AbstractDataCommand {
 
     private Gson gson;
     private final File file;
@@ -26,7 +27,7 @@ public final class SaveToFile extends AbstractSaveCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }

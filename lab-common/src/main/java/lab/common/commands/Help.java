@@ -3,26 +3,28 @@ package lab.common.commands;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import lab.common.users.User;
+
 public final class Help extends AbstractCommand {
 
-    private Collection<AbstractCommand> commands;
+    private Collection<Command> commands;
 
     public Help() {
         super();
     }
 
-    public Help(Collection<AbstractCommand> commands) {
+    public Help(Collection<Command> commands) {
         super(true);
         this.commands = commands;
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
         return new CommandResponse(CommandResult.SUCCESS,
-                commands.stream().map(AbstractCommand::getMan).collect(Collectors.joining("\n")));
+                commands.stream().map(Command::getMan).collect(Collectors.joining("\n")));
     }
 
     @Override

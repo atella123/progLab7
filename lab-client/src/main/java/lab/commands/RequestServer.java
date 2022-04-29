@@ -3,12 +3,14 @@ package lab.commands;
 import java.util.Arrays;
 
 import lab.common.commands.AbstractCommand;
+import lab.common.commands.Command;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.util.CommandManager;
 import lab.common.util.CommandRunner;
 import lab.common.util.CommandWithArguments;
 import lab.io.DatagramSocketIOManager;
+import lab.common.users.User;
 
 public final class RequestServer<R, C> extends AbstractCommand {
 
@@ -22,14 +24,14 @@ public final class RequestServer<R, C> extends AbstractCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isVaildArgument(args)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         if (!toServerCommandRunner.getCommandManager().containsKey(args[0])) {
             return new CommandResponse(CommandResult.ERROR, "Unknown command");
         }
-        AbstractCommand command = toServerCommandRunner.getCommandManager().get(args[0]);
+        Command command = toServerCommandRunner.getCommandManager().get(args[0]);
         Object[] parsedArgs = toServerCommandRunner.parseArguments(command, Arrays.copyOfRange(args, 1, args.length));
         if (!command.isVaildArgument(parsedArgs)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");

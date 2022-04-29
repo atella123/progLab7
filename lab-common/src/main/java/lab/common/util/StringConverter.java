@@ -1,6 +1,8 @@
 package lab.common.util;
 
+import java.util.function.Function;
+
 @FunctionalInterface
-public interface StringConverter<T> extends Converter<String, T> {
-    T convert(String f);
+public interface StringConverter<T> extends Function<String, T> {
+    T apply(String f);
 }

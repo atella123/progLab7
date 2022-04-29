@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import lab.common.data.Country;
 import lab.common.data.DataManager;
 import lab.common.data.Person;
+import lab.common.users.User;
 
 public final class FilterLessThanNationality extends AbstractDataCommand {
 
@@ -17,7 +18,7 @@ public final class FilterLessThanNationality extends AbstractDataCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }

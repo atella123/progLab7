@@ -5,19 +5,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lab.common.commands.AbstractCommand;
+import lab.common.commands.Command;
 
 public final class CommandWithArguments implements Serializable {
 
-    final Class<? extends AbstractCommand> commandClass;
+    final Class<? extends Command> commandClass;
     final ArrayList<Object> arguments;
 
-    public CommandWithArguments(Class<? extends AbstractCommand> commandClass, Object... arguments) {
+    public CommandWithArguments(Class<? extends Command> commandClass, Object... arguments) {
         this.commandClass = commandClass;
         this.arguments = new ArrayList<>(Arrays.asList(arguments));
     }
 
-    public Class<? extends AbstractCommand> getCommandClass() {
+    public Class<? extends Command> getCommandClass() {
         return commandClass;
     }
 

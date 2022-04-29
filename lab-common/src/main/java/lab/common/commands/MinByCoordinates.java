@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import lab.common.data.DataManager;
 import lab.common.data.Person;
+import lab.common.users.User;
 
 public final class MinByCoordinates extends AbstractDataCommand {
 
@@ -16,7 +17,7 @@ public final class MinByCoordinates extends AbstractDataCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }

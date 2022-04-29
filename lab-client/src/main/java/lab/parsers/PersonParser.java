@@ -14,14 +14,15 @@ public final class PersonParser {
     }
 
     public static Person parsePerson(IOManager<String, String> io) {
-        String name = parseName(io);
-        Coordinates coordinates = parseCoordinates(io);
-        int height = parseHeight(io);
-        String passportID = parsePassportID(io);
-        Color eyeColor = parseEyeColor(io);
-        Country nationality = parseNationality(io);
-        Location location = parseLocation(io);
-        return new Person(name, coordinates, height, passportID, eyeColor, nationality, location);
+        Person.Builder builder = new Person.Builder();
+        builder.setName(parseName(io));
+        builder.setCoordinates(parseCoordinates(io));
+        builder.setHeigth(parseHeight(io));
+        builder.setPassportID(parsePassportID(io));
+        builder.setEyeColor(parseEyeColor(io));
+        builder.setNationality(parseNationality(io));
+        builder.setLocation(parseLocation(io));
+        return builder.build();
     }
 
     public static String parseName(IOManager<String, String> io) {

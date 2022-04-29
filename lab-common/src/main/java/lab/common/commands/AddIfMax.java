@@ -2,6 +2,7 @@ package lab.common.commands;
 
 import lab.common.data.DataManager;
 import lab.common.data.Person;
+import lab.common.users.User;
 
 public final class AddIfMax extends AbstractDataCommand {
 
@@ -14,7 +15,7 @@ public final class AddIfMax extends AbstractDataCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
@@ -22,7 +23,7 @@ public final class AddIfMax extends AbstractDataCommand {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         Person p = (Person) args[0];
-        getManager().addIfMax(p);
+        getManager().addIfAllMatches(p, p2 -> p.compareTo(p) > 0);
         return new CommandResponse(CommandResult.SUCCESS);
     }
 

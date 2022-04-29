@@ -9,8 +9,8 @@ import lab.common.exceptions.IllegalFieldValueException;
 public class Person implements Comparable<Person>, Serializable {
 
     private Integer id; // Поле не может быть null, Значение поля должно быть больше 0, Значение этого
-                        // поля должно быть уникальным, Значение этого поля должно генерироваться
-                        // автоматически
+    // поля должно быть уникальным, Значение этого поля должно генерироваться
+    // автоматически
     private String name; // Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; // Поле не может быть null
     private LocalDate creationDate; // Поле не может быть null, Значение этого поля должно
@@ -21,6 +21,9 @@ public class Person implements Comparable<Person>, Serializable {
     private Color eyeColor; // Поле может быть null
     private Country nationality; // Поле не может быть null
     private Location location; // Поле не может быть null
+
+    private Person() {
+    }
 
     public Person(String name, Coordinates coordinates, int height, String passportID, Color eyeColor,
             Country nationality, Location location) {
@@ -69,7 +72,7 @@ public class Person implements Comparable<Person>, Serializable {
         return creationDate;
     }
 
-    private void setCreationDate() {
+    public void setCreationDate() {
         creationDate = LocalDate.now();
     }
 
@@ -223,6 +226,74 @@ public class Person implements Comparable<Person>, Serializable {
 
         public static boolean isValidLocation(Location location) {
             return Objects.nonNull(location);
+        }
+    }
+
+    public static class Builder {
+
+        private Person person;
+
+        public Builder() {
+            this.person = new Person();
+        }
+
+        public Builder setId(Integer id) {
+            person.id = id;
+            return this;
+        }
+
+        public Builder setName(String name) {
+            person.name = name;
+            return this;
+        }
+
+        public Builder setCoordinates(Coordinates coordinates) {
+            person.coordinates = coordinates;
+            return this;
+        }
+
+        public Builder setHeigth(int height) {
+            person.height = height;
+            return this;
+        }
+
+        public Builder setPassportID(String passportID) {
+            person.passportID = passportID;
+            return this;
+        }
+
+        public Builder setEyeColor(Color eyeColor) {
+            person.eyeColor = eyeColor;
+            return this;
+        }
+
+        public Builder setNationality(Country nationality) {
+            person.nationality = nationality;
+            return this;
+        }
+
+        public Builder setLocation(Location location) {
+            person.location = location;
+            return this;
+        }
+
+        public Builder setCreationDate(LocalDate date) {
+            person.creationDate = date;
+            return this;
+        }
+
+        public Person build() {
+            Person newPerson = new Person();
+            newPerson.setID(person.id);
+            newPerson.setName(person.name);
+            newPerson.setCoordinates(person.coordinates);
+            newPerson.setCreationDate(person.creationDate);
+            newPerson.setHeight(person.height);
+            newPerson.setPassportID(person.passportID);
+            newPerson.setEyeColor(person.eyeColor);
+            newPerson.setNationality(person.nationality);
+            newPerson.setLocation(person.location);
+            return newPerson;
         }
     }
 }

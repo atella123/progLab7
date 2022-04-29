@@ -1,5 +1,7 @@
 package lab.common.commands;
 
+import lab.common.users.User;
+
 public final class Exit extends AbstractCommand {
 
     public Exit() {
@@ -7,7 +9,7 @@ public final class Exit extends AbstractCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         return new CommandResponse(CommandResult.END);
     }
 

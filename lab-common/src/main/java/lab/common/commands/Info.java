@@ -2,6 +2,7 @@ package lab.common.commands;
 
 import lab.common.data.DataManager;
 import lab.common.data.Person;
+import lab.common.users.User;
 
 public final class Info extends AbstractDataCommand {
 
@@ -14,7 +15,7 @@ public final class Info extends AbstractDataCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }

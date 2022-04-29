@@ -34,7 +34,7 @@ public final class DataReader {
         return s;
     }
 
-    public static <T> T readStringAsObject(IOManager<String, String> io, Converter<String, T> converter,
+    public static <T> T readStringAsObject(IOManager<String, String> io, StringConverter<T> converter,
             String illegalValueMessage,
             boolean canBeNull) {
         T t;
@@ -50,10 +50,10 @@ public final class DataReader {
         }
     }
 
-    private static <T> T convertString(String s, Converter<String, T> converter, boolean canBeNull) {
+    private static <T> T convertString(String s, StringConverter<T> converter, boolean canBeNull) {
         if (!Objects.isNull(s) || canBeNull) {
             try {
-                return converter.convert(s);
+                return converter.apply(s);
             } catch (NumberFormatException e) {
                 throw new UnableToConvertValueException();
             }
@@ -61,7 +61,7 @@ public final class DataReader {
         throw new UnableToConvertValueException();
     }
 
-    public static <T> T readStringAsValidObject(IOManager<String, String> io, Converter<String, T> converter,
+    public static <T> T readStringAsValidObject(IOManager<String, String> io, StringConverter<T> converter,
             Predicate<T> predicate,
             String illegalValueMessage, String convertMessage, boolean canBeNull) {
         T t = readStringAsObject(io, converter, illegalValueMessage, canBeNull);

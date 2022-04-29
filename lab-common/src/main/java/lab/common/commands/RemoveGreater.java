@@ -2,6 +2,7 @@ package lab.common.commands;
 
 import lab.common.data.DataManager;
 import lab.common.data.Person;
+import lab.common.users.User;
 
 public final class RemoveGreater extends AbstractDataCommand {
 
@@ -14,15 +15,15 @@ public final class RemoveGreater extends AbstractDataCommand {
     }
 
     @Override
-    public CommandResponse execute(Object... args) {
+    public CommandResponse execute(User user, Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
         if (!isVaildArgument(args)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
-        Person person = (Person) args[0];
-        getManager().removeGreater(person);
+        Person p = (Person) args[0];
+        getManager().removeMatches(p2 -> p.compareTo(p2) < 0);
         return new CommandResponse(CommandResult.SUCCESS);
     }
 

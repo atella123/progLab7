@@ -1,18 +1,19 @@
 package lab.common.util;
 
 import java.util.HashMap;
+import java.util.function.Function;
 
 import lab.common.exceptions.NoParserAvailableException;
 
 public class ArgumentParser<T> {
 
-    private final HashMap<Class<?>, Converter<T, ?>> classParsers = new HashMap<>();
+    private final HashMap<Class<?>, Function<T, ?>> classParsers = new HashMap<>();
 
     public ArgumentParser() {
         add(Object.class, x -> x);
     }
 
-    public <A> void add(Class<A> clazz, Converter<T, A> converter) {
+    public <A> void add(Class<A> clazz, Function<T, A> converter) {
         classParsers.put(clazz, converter);
     }
 
@@ -27,7 +28,7 @@ public class ArgumentParser<T> {
         if (!classParsers.containsKey(clazz)) {
             throw new NoParserAvailableException("For " + clazz);
         }
-        return classParsers.get(clazz).convert(argument);
+        return classParsers.get(clazz).apply(argument);
     }
 
     public boolean canParse(Class<?> clazz) {
