@@ -52,12 +52,12 @@ public final class PersonParser {
 
     public static Color parseEyeColor(IOManager<String, String> io) {
         io.write("Enter person eyeColor");
-        return DataReader.readEnumValue(io, Color.class);
+        return DataReader.readEnumValueOrIndex(io, Color.class);
     }
 
     public static Country parseNationality(IOManager<String, String> io) {
         io.write("Enter person nationality");
-        return DataReader.readEnumValue(io, Country.class);
+        return DataReader.readEnumValueOrIndex(io, Country.class);
     }
 
     public static Location parseLocation(IOManager<String, String> io) {

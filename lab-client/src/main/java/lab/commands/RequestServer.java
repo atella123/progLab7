@@ -31,10 +31,7 @@ public final class RequestServer extends AbstractCommand {
 
     @Override
     public CommandResponse execute(Object... args) {
-        if (!isVaildArgument(args)) {
-            return new CommandResponse(CommandResult.ERROR, "Illegal argument");
-        }
-        if (!commandsMap.containsValue(args[0])) {
+        if (!isVaildArgument(args) || !commandsMap.containsValue(args[0])) {
             return new CommandResponse(CommandResult.ERROR, "Unknown command");
         }
         DataCommand command = (DataCommand) args[0];

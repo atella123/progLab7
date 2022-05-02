@@ -49,7 +49,8 @@ public class ClientCommandRunner extends AbstractStringCommandRunner implements 
         Object[] args = getArgumentParser().parseArguments(command, parseArgumentsFromString(nextLine));
         if (command != requestCommand) {
             updateHistory(command.toString());
-        } else {
+        }
+        if (args.length > 0) {
             updateHistory(args[0].toString());
         }
         return command.execute(args);

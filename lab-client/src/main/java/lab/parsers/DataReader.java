@@ -80,6 +80,35 @@ public final class DataReader {
         return Enum.valueOf(enumClass, s);
     }
 
+    public static <E extends Enum<E>> E readEnumValueByIndex(int index, Class<E> enumClass) {
+        E[] values = enumClass.getEnumConstants();
+        if (values.length < index) {
+            throw new IllegalArgumentException();
+        }
+        return values[index];
+    }
+
+    public static <E extends Enum<E>> E readEnumValueOrIndex(IOManager<String, String> io, Class<E> enumClass) {
+        String s;
+        while (true) {
+            EnumUtil.printEnumValuesWithIndexes(io, enumClass);
+            s = readString(io).toUpperCase();
+            if (Objects.isNull(s)) {
+                io.write("Can't get value from empty string");
+                continue;
+            }
+            if (s.matches("\\d+")) {
+                int index = Integer.parseInt(s) - 1;
+                if (index > -1 && EnumUtil.enumValuesCount(enumClass) > index) {
+                    return readEnumValueByIndex(index, enumClass);
+                }
+            }
+            if (EnumUtil.isEnumValue(s, enumClass)) {
+                return Enum.valueOf(enumClass, s);
+            }
+        }
+    }
+
     public static <E extends Enum<E>> E readEnumValue(String s, Class<E> enumClass) {
         if (Objects.nonNull(s) && EnumUtil.isEnumValue(s.toUpperCase(), enumClass)) {
             return Enum.valueOf(enumClass, s.toUpperCase());
