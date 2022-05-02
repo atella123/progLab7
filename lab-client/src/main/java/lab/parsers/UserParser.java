@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
+import lab.common.commands.datacommands.RegisterCommandFlags;
 import lab.common.commands.datacommands.RegisterUserConnection;
 import lab.common.commands.datacommands.User;
 import lab.common.io.IOManager;
@@ -36,7 +37,6 @@ public final class UserParser {
             String loginOrRegister = DataReader.readValidString(new IOManager<>(clientIO::readLine, writter),
                     (x -> x.matches("([Ll](ogin)?)|([Rr](egister)?)")),
                     "Please enter [Ll](ogin) to continue singing in or R(egister) to continue registration");
-            loginOrRegister = loginOrRegister.substring(0, 1).toUpperCase();
 
             writter.write("Enter username:");
             String username = DataReader.readValidString(stringIO, x -> x.length() <= MAX_USERNAME_LEN,
@@ -47,7 +47,7 @@ public final class UserParser {
 
             user = new User(username, password);
             DataCommandExecuteRequest request = new DataCommandExecuteRequest(user, RegisterUserConnection.class,
-                    loginOrRegister);
+                    RegisterCommandFlags.getFlag(loginOrRegister));
 
             toServerIO.write(request);
             response = toServerIO.readLine();

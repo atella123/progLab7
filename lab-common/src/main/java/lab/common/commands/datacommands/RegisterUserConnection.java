@@ -26,7 +26,7 @@ public final class RegisterUserConnection extends AbstractDataCommand {
         if (!isVaildArgument(args)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
-        if (args[0].equals("R")) {
+        if (args[0] == RegisterCommandFlags.REGISTER) {
             if (userManager.isUsernameTaken(user)) {
                 return new CommandResponse(CommandResult.ERROR, "Username is already taken");
             }
@@ -39,19 +39,13 @@ public final class RegisterUserConnection extends AbstractDataCommand {
 
     @Override
     public boolean isVaildArgument(Object... args) {
-        if (args.length == 0) {
-            return false;
-        }
-        if (args[0].getClass() != String.class) {
-            return false;
-        }
-        return ((String) args[0]).matches("[LR]");
+        return args.length > 0 && args[0] instanceof RegisterCommandFlags;
     }
 
     @Override
     public Class<?>[] getArgumentClasses() {
         return new Class[] {
-                String.class };
+                RegisterCommandFlags.class };
     }
 
     @Override
