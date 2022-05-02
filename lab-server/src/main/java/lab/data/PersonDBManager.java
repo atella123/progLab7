@@ -25,7 +25,6 @@ import lab.common.data.Coordinates;
 import lab.common.data.Country;
 import lab.common.data.Location;
 import lab.common.data.Person;
-import lab.util.UserDBManager;
 
 public class PersonDBManager implements OwnedDataManager<Person> {
 
@@ -40,12 +39,12 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             + "location_x REAL NOT NULL, location_y BIGINT NOT NULL,"
             + "location_name TEXT NOT NULL,"
             + "CONSTRAINT owner FOREIGN KEY(owner_name) REFERENCES users(name) ON DELETE SET NULL);"
-            + "CREATE SEQUENCE IF NOT EXISTS personID OWNED BY persons.id";
+            + "CREATE SEQUENCE IF NOT EXISTS personID OWNED BY persons.id;";
 
-    private static final String PREPARED_INSERT_QUERY = "INSERT INTO persons (id, name, owner_name,"
+    private static final String PREPARED_INSERT_QUERY = "INSERT INTO persons (name,"
             + "coordinates_x,coordinates_y,creation_date,"
             + "height,passport_id,eye_color,country,"
-            + "location_x,location_y,location_name)"
+            + "location_x,location_y,location_name, id, owner_name)"
             + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
     private static final String PREPARED_UPDATE_QUERY = "UPDATE persons SET name = ?,"
@@ -55,6 +54,20 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             + "WHERE id = ?;";
 
     private static final String INVALID_USER_MESSAGE = "Invalid username or password";
+
+    private static final int NAME_INDEX = 1;
+    private static final int COORD_X_INDEX = 2;
+    private static final int COORD_Y_INDEX = 3;
+    private static final int CREATION_DATE_INDEX = 4;
+    private static final int HEIGHT_INDEX = 5;
+    private static final int PASSPORT_ID_INDEX = 6;
+    private static final int EYE_COLOR_INDEX = 7;
+    private static final int NATIONALITY_INDEX = 8;
+    private static final int LOCATION_X_INDEX = 9;
+    private static final int LOCATION_Y_INDEX = 10;
+    private static final int LOCATION_NAME_INDEX = 11;
+    private static final int ID_INDEX = 12;
+    private static final int OWNER_NAME_INDEX = 13;
 
     private final Connection connection;
     private final UserDBManager userManager;
@@ -169,25 +182,24 @@ public class PersonDBManager implements OwnedDataManager<Person> {
 
         try (Statement statement = connection.createStatement();
                 PreparedStatement insertStatement = connection.prepareStatement(PREPARED_INSERT_QUERY)) {
-            int i = 1;
 
             ResultSet result = statement.executeQuery("SELECT nextval('personID');");
 
             result.next();
 
-            insertStatement.setInt(i++, result.getInt(1));
-            insertStatement.setString(i++, person.getName());
-            insertStatement.setString(i++, user.getUsername());
-            insertStatement.setFloat(i++, person.getCoordinates().getX());
-            insertStatement.setInt(i++, person.getCoordinates().getY());
-            insertStatement.setDate(i++, Date.valueOf(person.getCreationDate()));
-            insertStatement.setInt(i++, person.getHeight());
-            insertStatement.setString(i++, person.getPassportID());
-            insertStatement.setString(i++, person.getEyeColor().toString());
-            insertStatement.setString(i++, person.getNationality().toString());
-            insertStatement.setFloat(i++, person.getLocation().getX());
-            insertStatement.setLong(i++, person.getLocation().getY());
-            insertStatement.setString(i, person.getLocation().getName());
+            insertStatement.setInt(ID_INDEX, result.getInt(1));
+            insertStatement.setString(NAME_INDEX, person.getName());
+            insertStatement.setString(OWNER_NAME_INDEX, user.getUsername());
+            insertStatement.setFloat(COORD_X_INDEX, person.getCoordinates().getX());
+            insertStatement.setInt(COORD_Y_INDEX, person.getCoordinates().getY());
+            insertStatement.setDate(CREATION_DATE_INDEX, Date.valueOf(person.getCreationDate()));
+            insertStatement.setInt(HEIGHT_INDEX, person.getHeight());
+            insertStatement.setString(PASSPORT_ID_INDEX, person.getPassportID());
+            insertStatement.setString(EYE_COLOR_INDEX, person.getEyeColor().toString());
+            insertStatement.setString(NATIONALITY_INDEX, person.getNationality().toString());
+            insertStatement.setFloat(LOCATION_X_INDEX, person.getLocation().getX());
+            insertStatement.setLong(LOCATION_Y_INDEX, person.getLocation().getY());
+            insertStatement.setString(LOCATION_Y_INDEX, person.getLocation().getName());
 
             insertStatement.execute();
 
@@ -289,20 +301,20 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             return new DataManagerResponse(false, "Person is owned by another user");
         }
         try (PreparedStatement statement = connection.prepareStatement(PREPARED_UPDATE_QUERY)) {
-            int i = 1;
-            statement.setString(i++, person.getName());
-            statement.setFloat(i++, person.getCoordinates().getX());
-            statement.setInt(i++, person.getCoordinates().getY());
-            statement.setDate(i++, Date.valueOf(person.getCreationDate()));
-            statement.setInt(i++, person.getHeight());
-            statement.setString(i++, person.getPassportID());
-            statement.setString(i++, person.getEyeColor().toString());
-            statement.setString(i++, person.getNationality().toString());
-            statement.setFloat(i++, person.getLocation().getX());
-            statement.setLong(i++, person.getLocation().getY());
-            statement.setString(i++, person.getLocation().getName());
 
-            statement.setInt(i, id);
+            statement.setString(NAME_INDEX, person.getName());
+            statement.setFloat(COORD_X_INDEX, person.getCoordinates().getX());
+            statement.setInt(COORD_Y_INDEX, person.getCoordinates().getY());
+            statement.setDate(CREATION_DATE_INDEX, Date.valueOf(person.getCreationDate()));
+            statement.setInt(HEIGHT_INDEX, person.getHeight());
+            statement.setString(PASSPORT_ID_INDEX, person.getPassportID());
+            statement.setString(EYE_COLOR_INDEX, person.getEyeColor().toString());
+            statement.setString(NAME_INDEX, person.getNationality().toString());
+            statement.setFloat(LOCATION_X_INDEX, person.getLocation().getX());
+            statement.setLong(LOCATION_Y_INDEX, person.getLocation().getY());
+            statement.setString(LOCATION_NAME_INDEX, person.getLocation().getName());
+            statement.setInt(ID_INDEX, id);
+
             statement.execute();
         } catch (SQLException e) {
             LOGGER.error("Failed to update person: {}", e.getMessage());
