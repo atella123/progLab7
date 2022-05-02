@@ -247,7 +247,7 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to delete person: {}", e.getMessage());
             return new DataManagerResponse<>(false, "An error occured when trying to delete person");
         }
         return new DataManagerResponse<>();
@@ -305,7 +305,7 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             statement.setInt(i, id);
             statement.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to update person: {}", e.getMessage());
             return new DataManagerResponse<>(false, "An error occured when trying to update person");
         }
         collectionManager.updateID(id, person);
@@ -335,7 +335,7 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to delete person: {}", e.getMessage());
             return new DataManagerResponse<>(false, "An error occured when trying to delete person");
         }
         return new DataManagerResponse<>();

@@ -84,7 +84,7 @@ public class DatagramChannelIOManager extends IOManager<DataCommandExecuteReques
             try {
                 datagramChannel.send(byteBuffer, lastRemotAddress);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("An error occured when sending response: {}", e.getMessage());
             }
         }
     }

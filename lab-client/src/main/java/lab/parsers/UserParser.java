@@ -18,12 +18,13 @@ public final class UserParser {
 
     public static User readUser(Writter<String> writter, IOManager<String, CommandResponse> clientIO,
             IOManager<CommandResponse, DataCommandExecuteRequest> toServerIO) {
+
         CommandResponse response = null;
         User user;
-
         IOManager<String, String> stringIO = new IOManager<>(clientIO::readLine, writter);
 
         do {
+
             if (Objects.nonNull(response) && response.hasPrintableResult()) {
                 writter.write(response.getMessage());
             }
@@ -42,18 +43,14 @@ public final class UserParser {
                     "Password lenght must be less than or equal to 30");
 
             user = new User(username, password);
-
             DataCommandExecuteRequest request = new DataCommandExecuteRequest(user, RegisterUserConnection.class,
                     loginOrRegister);
 
             toServerIO.write(request);
-
             response = toServerIO.readLine();
 
         } while (response.getResult() != CommandResult.SUCCESS);
-
         writter.write("Logged in successfully");
-
         return user;
     }
 

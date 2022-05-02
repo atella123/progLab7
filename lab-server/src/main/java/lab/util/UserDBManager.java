@@ -162,7 +162,7 @@ public final class UserDBManager implements UserManager {
             return hashed.getPassword().equals(result.getString(1));
 
         } catch (SQLException e) {
-            // TODO
+            LOGGER.error("Reading user failed: {}", e.getMessage());
             return false;
         }
 
