@@ -12,6 +12,9 @@ import lab.common.util.DataCommandExecuteRequest;
 
 public final class UserParser {
 
+    private static final int MAX_USERNAME_LEN = 30;
+    private static final int MAX_PASSWORD_LEN = 30;
+
     private UserParser() {
         throw new UnsupportedOperationException();
     }
@@ -36,11 +39,11 @@ public final class UserParser {
             loginOrRegister = loginOrRegister.substring(0, 1).toUpperCase();
 
             writter.write("Enter username:");
-            String username = DataReader.readValidString(stringIO, x -> x.length() <= 30,
-                    "Username lenght must be less than or equal to 30");
+            String username = DataReader.readValidString(stringIO, x -> x.length() <= MAX_USERNAME_LEN,
+                    String.format("Username lenght must be less than or equal to %d", MAX_USERNAME_LEN));
             writter.write("Enter password:");
-            String password = DataReader.readValidString(stringIO, x -> x.length() <= 30,
-                    "Password lenght must be less than or equal to 30");
+            String password = DataReader.readValidString(stringIO, x -> x.length() <= MAX_PASSWORD_LEN,
+                    String.format("Password lenght must be less than or equal to %d", MAX_PASSWORD_LEN));
 
             user = new User(username, password);
             DataCommandExecuteRequest request = new DataCommandExecuteRequest(user, RegisterUserConnection.class,
