@@ -28,7 +28,7 @@ public final class SaveToFile extends AbstractDataCommand {
 
     @Override
     public CommandResponse execute(User user, Object... args) {
-        if (!isExecutableInstance) {
+        if (!executableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
         if (file.exists() && file.canWrite()) {

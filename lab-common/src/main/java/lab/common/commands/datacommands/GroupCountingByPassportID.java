@@ -19,7 +19,7 @@ public final class GroupCountingByPassportID extends AbstractDataCommand {
 
     @Override
     public CommandResponse execute(User user, Object... args) {
-        if (!isExecutableInstance) {
+        if (!executableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
         Map<String, Long> groupCounting = getManager().getAsCollection().stream()

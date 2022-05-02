@@ -31,7 +31,10 @@ public final class RequestServer extends AbstractCommand {
 
     @Override
     public CommandResponse execute(Object... args) {
-        if (!isVaildArgument(args) || !commandsMap.containsValue(args[0])) {
+        if (!isExecutableInstance()) {
+            return new CommandResponse(CommandResult.ERROR, "Execute called onunexecutable instance");
+        }
+        if (!isVaildArgument(args)) {
             return new CommandResponse(CommandResult.ERROR, "Unknown command");
         }
         DataCommand command = (DataCommand) args[0];
@@ -48,7 +51,7 @@ public final class RequestServer extends AbstractCommand {
 
     @Override
     public boolean isVaildArgument(Object... args) {
-        return args.length > 0;
+        return args.length > 0 && commandsMap.containsValue(args[0]);
     }
 
     @Override

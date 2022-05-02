@@ -167,8 +167,7 @@
         <module name="OneStatementPerLine"/>
         <module name="ParameterAssignment"/>
         <module name="ReturnCount">
-        <!-- lab-server/src/main/java/lab/data/PersonDBManager.java (removeByID) не поннятно как чинить, если честно -->
-            <property name="max" value="5"/>
+            <property name="max" value="4"/>
             <property name="maxForVoid" value="3"/>
         </module>
         <module name="SimplifyBooleanExpression"/>

@@ -2,6 +2,7 @@ package lab.common.commands.datacommands;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
+import lab.common.commands.ValidityChecker;
 import lab.common.data.Person;
 
 public final class Add extends AbstractDataCommand {
@@ -16,11 +17,9 @@ public final class Add extends AbstractDataCommand {
 
     @Override
     public CommandResponse execute(User user, Object... args) {
-        if (!isExecutableInstance) {
-            return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
-        }
-        if (!isVaildArgument(args)) {
-            return new CommandResponse(CommandResult.ERROR, "Illegal argument");
+        CommandResponse validy = ValidityChecker.checkValidity(this, args);
+        if (validy.getResult() != CommandResult.SUCCESS) {
+            return validy;
         }
         Person p = (Person) args[0];
         DataManagerResponse dataManagerResponse = getManager().add(user, p);

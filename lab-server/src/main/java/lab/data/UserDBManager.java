@@ -1,6 +1,7 @@
 package lab.data;
 
 import java.sql.Statement;
+import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -135,31 +136,22 @@ public final class UserDBManager implements UserManager {
     }
 
     @Override
-    public boolean compareUsers(User nothashed, User hashed) {
-
-        if (!nothashed.getUsername().equals(hashed.getUsername())) {
-            return false;
-        }
+    public boolean isValidUser(User user) {
 
         try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT password FROM users WHERE name = ? AND password = ?;")) {
+                "SELECT password FROM users WHERE name = ?;")) {
 
-            hashFunction.update(nothashed.getPassword().getBytes());
-
-            int i = 1;
-
-            statement.setString(i++, nothashed.getUsername());
-            statement.setBytes(i, hashFunction.digest());
-
+            statement.setString(1, user.getUsername());
             statement.execute();
-
             ResultSet result = statement.getResultSet();
 
             if (!result.next()) {
                 return false;
             }
 
-            return hashed.getPassword().equals(result.getString(1));
+            hashFunction.update(user.getPassword().getBytes());
+
+            return Arrays.equals(hashFunction.digest(), result.getBytes(1));
 
         } catch (SQLException e) {
             LOGGER.error("Reading user failed: {}", e.getMessage());

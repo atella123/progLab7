@@ -151,8 +151,11 @@ public class PersonDBManager implements OwnedDataManager<Person> {
     }
 
     private boolean isOwner(User user, int id) {
+        if (!userManager.isValidUser(user)) {
+            return false;
+        }
         try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT * FROM users WHERE name = (SELECT owner_name FROM persons WHERE id = ?)")) {
+                "SELECT name FROM users WHERE name = (SELECT owner_name FROM persons WHERE id = ?)")) {
 
             statement.setInt(1, id);
             statement.execute();
@@ -160,7 +163,7 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             ResultSet result = statement.getResultSet();
             result.next();
 
-            return userManager.compareUsers(user, new User(result.getString(1), result.getString(2)));
+            return result.getString(1).equals(user.getUsername());
 
         } catch (SQLException e) {
             LOGGER.error("Couldn't check if {} is owner of Person with id {}: {}", user.getUsername(), id,
@@ -169,6 +172,20 @@ public class PersonDBManager implements OwnedDataManager<Person> {
         return false;
     }
 
+    private DataManagerResponse canUpdate(User user, int id) {
+        if (!isPresent(id)) {
+            return new DataManagerResponse(false, String.format("No element with id %d is present", id));
+        }
+        if (!userManager.isRegisteredUser(user)) {
+            return new DataManagerResponse(false, INVALID_USER_MESSAGE);
+        }
+        if (!isOwner(user, id)) {
+            return new DataManagerResponse(false, "Person is owned by another user");
+        }
+        return new DataManagerResponse();
+    }
+
+    @Override
     public boolean allMatches(Predicate<Person> predicate) {
         return collectionManager.allMatches(predicate);
     }
@@ -233,31 +250,21 @@ public class PersonDBManager implements OwnedDataManager<Person> {
         return new DataManagerResponse();
     }
 
-    // Здесь пришлось редактировать конфиг чекстайла, ибо как небольно сделать 4
-    // точки выхода придумать не получилось
     @Override
     public DataManagerResponse removeByID(User user, int id) {
-        if (!isPresent(id)) {
-            return new DataManagerResponse(false, String.format("No element with id %d is present", id));
+        DataManagerResponse canUpdateResponse = canUpdate(user, id);
+        if (!canUpdateResponse.isSuccess()) {
+            return canUpdateResponse;
         }
-        if (!userManager.isRegisteredUser(user)) {
-            return new DataManagerResponse(false, INVALID_USER_MESSAGE);
-        }
-        if (!isOwner(user, id)) {
-            return new DataManagerResponse(false, "Person is owned by another user");
-        }
-
         try (PreparedStatement statement = connection.prepareStatement(
                 "DELETE FROM persons WHERE id = ? RETURNING id")) {
             statement.setInt(1, id);
             statement.execute();
 
             ResultSet result = statement.getResultSet();
-
             if (result.next()) {
                 collectionManager.removeByID(id);
             }
-
         } catch (SQLException e) {
             LOGGER.error("Failed to delete person: {}", e.getMessage());
             return new DataManagerResponse(false, "An error occured when trying to delete person");
@@ -291,14 +298,9 @@ public class PersonDBManager implements OwnedDataManager<Person> {
 
     @Override
     public DataManagerResponse updateID(User user, int id, Person person) {
-        if (!isPresent(id)) {
-            return new DataManagerResponse(false, String.format("No element with id %d is present", id));
-        }
-        if (!userManager.isRegisteredUser(user)) {
-            return new DataManagerResponse(false, INVALID_USER_MESSAGE);
-        }
-        if (!isOwner(user, id)) {
-            return new DataManagerResponse(false, "Person is owned by another user");
+        DataManagerResponse canUpdateResponse = canUpdate(user, id);
+        if (!canUpdateResponse.isSuccess()) {
+            return canUpdateResponse;
         }
         try (PreparedStatement statement = connection.prepareStatement(PREPARED_UPDATE_QUERY)) {
 

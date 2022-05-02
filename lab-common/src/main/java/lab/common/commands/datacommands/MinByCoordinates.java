@@ -18,7 +18,7 @@ public final class MinByCoordinates extends AbstractDataCommand {
 
     @Override
     public CommandResponse execute(User user, Object... args) {
-        if (!isExecutableInstance) {
+        if (!executableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
         Optional<Person> minPerson = getManager()

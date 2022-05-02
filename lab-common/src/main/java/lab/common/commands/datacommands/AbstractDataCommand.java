@@ -4,19 +4,19 @@ import lab.common.data.Person;
 
 public abstract class AbstractDataCommand implements DataCommand {
 
-    protected final boolean isExecutableInstance;
+    protected final boolean executableInstance;
     private OwnedDataManager<Person> manager;
 
     public AbstractDataCommand() {
-        isExecutableInstance = false;
+        executableInstance = false;
     }
 
     protected AbstractDataCommand(boolean isExecutableInstance) {
-        this.isExecutableInstance = isExecutableInstance;
+        this.executableInstance = isExecutableInstance;
     }
 
     public AbstractDataCommand(OwnedDataManager<Person> manager) {
-        isExecutableInstance = true;
+        executableInstance = true;
         this.manager = manager;
     }
 
@@ -34,7 +34,7 @@ public abstract class AbstractDataCommand implements DataCommand {
     }
 
     public boolean isExecutableInstance() {
-        return isExecutableInstance;
+        return executableInstance;
     }
 
 }

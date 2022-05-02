@@ -12,6 +12,6 @@ public interface UserManager {
 
     boolean isRegisteredUser(User user);
 
-    boolean compareUsers(User u1, User u2);
+    boolean isValidUser(User user);
 
 }

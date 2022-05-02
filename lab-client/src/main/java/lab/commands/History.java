@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
+import lab.common.commands.ValidityChecker;
 import lab.common.util.CommandRunnerWithHistory;
 
 public final class History extends AbstractCommand {
@@ -22,8 +23,9 @@ public final class History extends AbstractCommand {
 
     @Override
     public CommandResponse execute(Object... args) {
-        if (!isExecutableInstance) {
-            return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
+        CommandResponse validy = ValidityChecker.checkValidity(this, args);
+        if (validy.getResult() != CommandResult.SUCCESS) {
+            return validy;
         }
         return new CommandResponse(CommandResult.SUCCESS,
                 commandRunner.getHistory().stream().map(Object::toString).collect(Collectors.joining("\n")));

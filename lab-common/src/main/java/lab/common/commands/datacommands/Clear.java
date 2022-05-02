@@ -16,7 +16,7 @@ public final class Clear extends AbstractDataCommand {
 
     @Override
     public CommandResponse execute(User user, Object... args) {
-        if (!isExecutableInstance) {
+        if (!executableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
         DataManagerResponse dataManagerResponse = getManager().clear(user);

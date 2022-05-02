@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import lab.common.commands.AbstractCommand;
+import lab.common.commands.ValidityChecker;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.io.Reader;
@@ -30,11 +31,9 @@ public final class ExecuteScript extends AbstractCommand {
 
     @Override
     public CommandResponse execute(Object... args) {
-        if (!isExecutableInstance) {
-            return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
-        }
-        if (!isVaildArgument(args)) {
-            return new CommandResponse(CommandResult.ERROR, "Illegal argument");
+        CommandResponse validy = ValidityChecker.checkValidity(this, args);
+        if (validy.getResult() != CommandResult.SUCCESS) {
+            return validy;
         }
         File file = (File) args[0];
         if (!bannedFiles.contains(file)) {
