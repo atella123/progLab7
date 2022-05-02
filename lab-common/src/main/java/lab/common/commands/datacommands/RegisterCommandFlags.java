@@ -5,10 +5,10 @@ public enum RegisterCommandFlags {
     REGISTER;
 
     public static RegisterCommandFlags getFlag(String s) {
-        if (s.matches("[Ll](ogin)")) {
+        if (s.matches("[Ll](ogin)?")) {
             return LOGIN;
         }
-        if (s.matches("[Rr](egister)")) {
+        if (s.matches("[Rr](egister)?")) {
             return REGISTER;
         }
         throw new IllegalArgumentException(

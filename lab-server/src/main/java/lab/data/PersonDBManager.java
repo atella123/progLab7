@@ -199,7 +199,7 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             insertStatement.setString(NATIONALITY_INDEX, person.getNationality().toString());
             insertStatement.setFloat(LOCATION_X_INDEX, person.getLocation().getX());
             insertStatement.setLong(LOCATION_Y_INDEX, person.getLocation().getY());
-            insertStatement.setString(LOCATION_Y_INDEX, person.getLocation().getName());
+            insertStatement.setString(LOCATION_NAME_INDEX, person.getLocation().getName());
 
             insertStatement.execute();
 
@@ -309,7 +309,7 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             statement.setInt(HEIGHT_INDEX, person.getHeight());
             statement.setString(PASSPORT_ID_INDEX, person.getPassportID());
             statement.setString(EYE_COLOR_INDEX, person.getEyeColor().toString());
-            statement.setString(NAME_INDEX, person.getNationality().toString());
+            statement.setString(NATIONALITY_INDEX, person.getNationality().toString());
             statement.setFloat(LOCATION_X_INDEX, person.getLocation().getX());
             statement.setLong(LOCATION_Y_INDEX, person.getLocation().getY());
             statement.setString(LOCATION_NAME_INDEX, person.getLocation().getName());
