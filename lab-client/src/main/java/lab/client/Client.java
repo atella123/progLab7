@@ -10,38 +10,38 @@ import java.util.Objects;
 import java.util.Scanner;
 
 import lab.commands.ExecuteScript;
-import lab.common.commands.Add;
-import lab.common.commands.AddIfMax;
-import lab.common.commands.Clear;
+import lab.commands.Help;
+import lab.commands.History;
 import lab.common.commands.Command;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.Exit;
-import lab.common.commands.FilterLessThanNationality;
-import lab.common.commands.GroupCountingByPassportID;
-import lab.common.commands.Help;
-import lab.common.commands.History;
-import lab.common.commands.Info;
-import lab.common.commands.MinByCoordinates;
-import lab.common.commands.RemoveByID;
-import lab.common.commands.RemoveGreater;
-import lab.common.commands.Show;
-import lab.common.commands.Update;
 import lab.common.data.Color;
 import lab.common.data.Coordinates;
-import lab.common.data.Location;
 import lab.common.data.Country;
+import lab.common.data.Location;
 import lab.common.data.Person;
+import lab.common.data.commands.Add;
+import lab.common.data.commands.AddIfMax;
+import lab.common.data.commands.Clear;
+import lab.common.data.commands.DataCommand;
+import lab.common.data.commands.FilterLessThanNationality;
+import lab.common.data.commands.GroupCountingByPassportID;
+import lab.common.data.commands.Info;
+import lab.common.data.commands.MinByCoordinates;
+import lab.common.data.commands.RemoveByID;
+import lab.common.data.commands.RemoveGreater;
+import lab.common.data.commands.Show;
+import lab.common.data.commands.Update;
 import lab.common.io.IOManager;
+import lab.common.io.Reader;
 import lab.common.io.Writter;
-import lab.common.parsers.CoordinatesParser;
-import lab.common.parsers.LocationParser;
-import lab.common.parsers.PersonParser;
 import lab.common.util.ArgumentParser;
-import lab.common.util.CommandManager;
-import lab.common.util.CommandRunner;
-import lab.common.util.DataReader;
-import lab.common.util.DefaultCommandRunner;
-import lab.util.ClientToServerCommandRunner;
+import lab.common.util.CommandRunnerWithHistory;
+import lab.parsers.CoordinatesParser;
+import lab.parsers.DataReader;
+import lab.parsers.LocationParser;
+import lab.parsers.PersonParser;
+import lab.util.ClientCommandRunner;
 
 public final class Client {
 
@@ -69,12 +69,12 @@ public final class Client {
         scanner.close();
     }
 
-    public static ClientToServerCommandRunner createCommandRunner(InetSocketAddress serverAdress,
+    public static ClientCommandRunner createCommandRunner(InetSocketAddress serverAdress,
             IOManager<String, ?> io)
             throws SocketException {
-        CommandManager<String> clientCommandManager = new CommandManager<>();
-        ArgumentParser<Object> argumentParser = new ArgumentParser<>();
-        IOManager<String, CommandResponse> commandRunnerIO = new IOManager<>(io::read,
+        Map<String, Command> clientCommandsMap = new HashMap<>();
+        ArgumentParser<String> argumentParser = new ArgumentParser<>();
+        IOManager<String, CommandResponse> commandRunnerIO = new IOManager<>(io::readLine,
                 response -> {
                     if (response.hasPrintableResult()) {
                         System.out.println(response.getMessage());
@@ -85,19 +85,17 @@ public final class Client {
                         }
                     }
                 });
-        CommandManager<String> serverCommandManager = new CommandManager<>(createServerCommandsMap());
-        CommandRunner<String, String> toServerCommandRunner = new DefaultCommandRunner(
-                serverCommandManager,
-                argumentParser, commandRunnerIO);
-        ClientToServerCommandRunner runner = new ClientToServerCommandRunner(clientCommandManager,
-                toServerCommandRunner,
+        Map<String, DataCommand> serverCommandsMap = createServerCommandsMap();
+        ClientCommandRunner runner = new ClientCommandRunner(clientCommandsMap, serverCommandsMap,
                 argumentParser, serverAdress, commandRunnerIO);
-        updateArgumentParser(argumentParser, runner);
-        clientCommandManager.setCommands(createCommands(runner));
+        updateArgumentParser(argumentParser, serverCommandsMap, io::readLine);
+        clientCommandsMap.putAll(createCommands(runner, serverCommandsMap));
         return runner;
     }
 
-    public static void updateArgumentParser(ArgumentParser<Object> argumentParser, CommandRunner<String, ?> runner) {
+    public static void updateArgumentParser(ArgumentParser<String> argumentParser,
+            Map<String, DataCommand> serverCommandsMap,
+            Reader<String> reader) {
         argumentParser.add(Integer.class, x -> {
             try {
                 return Integer.valueOf(convertToString(x));
@@ -117,11 +115,12 @@ public final class Client {
             return null;
         });
         argumentParser.add(Person.class,
-                x -> PersonParser.parsePerson(new IOManager<>(runner.getReader(), System.out::println)));
+                x -> PersonParser.parsePerson(new IOManager<>(reader, System.out::println)));
         argumentParser.add(Coordinates.class,
-                x -> CoordinatesParser.parseCoordinates(new IOManager<>(runner.getReader(), System.out::println)));
+                x -> CoordinatesParser.parseCoordinates(new IOManager<>(reader, System.out::println)));
         argumentParser.add(Location.class,
-                x -> LocationParser.parseLocation(new IOManager<>(runner.getReader(), System.out::println)));
+                x -> LocationParser.parseLocation(new IOManager<>(reader, System.out::println)));
+        argumentParser.add(DataCommand.class, serverCommandsMap::get);
     }
 
     public static String convertToString(Object o) {
@@ -167,16 +166,21 @@ public final class Client {
         return serverAdress;
     }
 
-    public static Map<String, Command> createCommands(CommandRunner<String, ?> commandRunner) {
+    public static Map<String, Command> createCommands(CommandRunnerWithHistory<String> commandRunner,
+            Map<String, DataCommand> serverCommands) {
         HashMap<String, Command> commands = new HashMap<>();
+        Help help = new Help();
+        help.addCommandMap(commands);
+        help.addCommandMap(serverCommands);
+        commands.put("help", help);
         commands.put("exit", new Exit());
+        commands.put("history", new History(commandRunner));
         commands.put("execute_script", new ExecuteScript(commandRunner));
         return commands;
     }
 
-    public static Map<String, Command> createServerCommandsMap() {
-        HashMap<String, Command> commands = new HashMap<>();
-        commands.put("help", new Help());
+    public static Map<String, DataCommand> createServerCommandsMap() {
+        HashMap<String, DataCommand> commands = new HashMap<>();
         commands.put("info", new Info());
         commands.put("show", new Show());
         commands.put("add", new Add());
@@ -185,7 +189,6 @@ public final class Client {
         commands.put("clear", new Clear());
         commands.put("add_if_max", new AddIfMax());
         commands.put("remove_greater", new RemoveGreater());
-        commands.put("history", new History());
         commands.put("min_by_coordinates", new MinByCoordinates());
         commands.put("group_counting_by_passport_id", new GroupCountingByPassportID());
         commands.put("filter_less_than_nationality", new FilterLessThanNationality());
