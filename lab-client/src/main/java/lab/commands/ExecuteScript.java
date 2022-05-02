@@ -40,7 +40,7 @@ public final class ExecuteScript extends AbstractCommand {
         if (!bannedFiles.contains(file)) {
             bannedFiles.push(file);
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-                oldIO.push(runner.getIO()::readLine);
+                oldIO.push(runner.getIO().getReader());
                 Reader<String> newReader = createReader(bufferedReader);
                 runner.getIO().setReader(newReader);
                 runner.run();

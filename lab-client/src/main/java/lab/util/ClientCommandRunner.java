@@ -27,7 +27,6 @@ public class ClientCommandRunner extends AbstractStringCommandRunner implements 
 
     private final RequestServer requestCommand;
     private final ArrayList<String> history = new ArrayList<>(HISTORY_SIZE);
-    private final Map<?, DataCommand> requestServerCommandsMap;
 
     public ClientCommandRunner(Map<String, Command> clientCommands,
             Map<String, DataCommand> serverCommands,
@@ -38,7 +37,6 @@ public class ClientCommandRunner extends AbstractStringCommandRunner implements 
         IOManager<CommandResponse, DataCommandExecuteRequest> serverIO = new DatagramSocketIOManager(serverAddress);
         this.requestCommand = new RequestServer(UserParser.readUser(System.out::println, io, serverIO), serverIO,
                 serverCommands, argumentParser);
-        this.requestServerCommandsMap = serverCommands;
     }
 
     @Override
@@ -52,7 +50,7 @@ public class ClientCommandRunner extends AbstractStringCommandRunner implements 
         if (command != requestCommand) {
             updateHistory(command.toString());
         } else {
-            updateHistory(requestServerCommandsMap.get(args[0]).toString());
+            updateHistory(args[0].toString());
         }
         return command.execute(args);
     }
