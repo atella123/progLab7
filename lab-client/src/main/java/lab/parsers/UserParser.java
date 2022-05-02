@@ -20,6 +20,9 @@ public final class UserParser {
             IOManager<CommandResponse, DataCommandExecuteRequest> toServerIO) {
         CommandResponse response = null;
         User user;
+
+        IOManager<String, String> stringIO = new IOManager<>(clientIO::readLine, writter);
+
         do {
             if (Objects.nonNull(response) && response.hasPrintableResult()) {
                 writter.write(response.getMessage());
@@ -32,9 +35,11 @@ public final class UserParser {
             loginOrRegister = loginOrRegister.substring(0, 1).toUpperCase();
 
             writter.write("Enter username:");
-            String username = clientIO.readLine();
+            String username = DataReader.readValidString(stringIO, x -> x.length() <= 30,
+                    "Username lenght must be less than or equal to 30");
             writter.write("Enter password:");
-            String password = clientIO.readLine();
+            String password = DataReader.readValidString(stringIO, x -> x.length() <= 30,
+                    "Password lenght must be less than or equal to 30");
 
             user = new User(username, password);
 
