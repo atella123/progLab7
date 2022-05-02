@@ -2,6 +2,7 @@ package lab.common.data.commands;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
+import lab.common.data.DataManagerResponse;
 import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
@@ -24,7 +25,10 @@ public final class Add extends AbstractDataCommand {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         Person p = (Person) args[0];
-        getManager().add(user, p);
+        DataManagerResponse dataManagerResponse = getManager().add(user, p);
+        if (!dataManagerResponse.isSuccess()) {
+            return new CommandResponse(CommandResult.ERROR, dataManagerResponse.getMessage());
+        }
         return new CommandResponse(CommandResult.SUCCESS);
     }
 

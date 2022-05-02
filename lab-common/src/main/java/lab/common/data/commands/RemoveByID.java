@@ -25,7 +25,7 @@ public final class RemoveByID extends AbstractDataCommand {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         Integer id = (Integer) args[0];
-        DataManagerResponse<Person> dataResp = getManager().removeByID(user, id);
+        DataManagerResponse dataResp = getManager().removeByID(user, id);
         if (!dataResp.isSuccess()) {
             return new CommandResponse(CommandResult.SUCCESS);
         }

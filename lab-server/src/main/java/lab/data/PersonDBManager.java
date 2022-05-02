@@ -161,10 +161,10 @@ public class PersonDBManager implements OwnedDataManager<Person> {
     }
 
     @Override
-    public DataManagerResponse<Person> add(User user, Person person) {
+    public DataManagerResponse add(User user, Person person) {
 
         if (!userManager.isRegisteredUser(user)) {
-            return new DataManagerResponse<>(true, "Couldn't add person to DB, user doens't exist");
+            return new DataManagerResponse(false, "Couldn't add person to DB, user doens't exist");
         }
 
         try (Statement statement = connection.createStatement();
@@ -194,45 +194,45 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             collectionManager.add(new Person.Builder(person).setId(result.getInt(1)).build());
         } catch (SQLException e) {
             LOGGER.error("An error occurred while trying to write to database: {}", e.getMessage());
-            return new DataManagerResponse<>(false, "An error occurred while trying to add person");
+            return new DataManagerResponse(false, "An error occurred while trying to add person");
         }
 
-        return new DataManagerResponse<>();
+        return new DataManagerResponse();
     }
 
     @Override
-    public DataManagerResponse<Person> addIfAllMatches(User user, Person person, Predicate<Person> predicate) {
+    public DataManagerResponse addIfAllMatches(User user, Person person, Predicate<Person> predicate) {
         if (!allMatches(predicate)) {
-            return new DataManagerResponse<>();
+            return new DataManagerResponse();
         }
         return add(user, person);
     }
 
     @Override
-    public DataManagerResponse<Person> remove(User user, Person person) {
+    public DataManagerResponse remove(User user, Person person) {
         return removeByID(user, person.getID());
     }
 
     @Override
-    public DataManagerResponse<Person> removeAll(User user, Collection<Person> collectionToRemove) {
+    public DataManagerResponse removeAll(User user, Collection<Person> collectionToRemove) {
         for (Person person : collectionToRemove) {
             removeByID(user, person.getID());
         }
-        return new DataManagerResponse<>();
+        return new DataManagerResponse();
     }
 
     // Здесь пришлось редактировать конфиг чекстайла, ибо как небольно сделать 4
     // точки выхода придумать не получилось
     @Override
-    public DataManagerResponse<Person> removeByID(User user, int id) {
+    public DataManagerResponse removeByID(User user, int id) {
         if (!isPresent(id)) {
-            return new DataManagerResponse<>(false, String.format("No element with id %d is present", id));
+            return new DataManagerResponse(false, String.format("No element with id %d is present", id));
         }
         if (!userManager.isRegisteredUser(user)) {
-            return new DataManagerResponse<>(false, INVALID_USER_MESSAGE);
+            return new DataManagerResponse(false, INVALID_USER_MESSAGE);
         }
         if (!isOwner(user, id)) {
-            return new DataManagerResponse<>(false, "Person is owned by another user");
+            return new DataManagerResponse(false, "Person is owned by another user");
         }
 
         try (PreparedStatement statement = connection.prepareStatement(
@@ -248,23 +248,23 @@ public class PersonDBManager implements OwnedDataManager<Person> {
 
         } catch (SQLException e) {
             LOGGER.error("Failed to delete person: {}", e.getMessage());
-            return new DataManagerResponse<>(false, "An error occured when trying to delete person");
+            return new DataManagerResponse(false, "An error occured when trying to delete person");
         }
-        return new DataManagerResponse<>();
+        return new DataManagerResponse();
 
     }
 
     @Override
-    public DataManagerResponse<Person> removeMatches(User user, Predicate<Person> predicate) {
+    public DataManagerResponse removeMatches(User user, Predicate<Person> predicate) {
         return removeAll(user, getMatches(predicate));
     }
 
     @Override
-    public DataManagerResponse<Person> removeIfAllMatches(User user, Person person, Predicate<Person> predicate) {
+    public DataManagerResponse removeIfAllMatches(User user, Person person, Predicate<Person> predicate) {
         if (allMatches(predicate)) {
             return remove(user, person);
         }
-        return new DataManagerResponse<>();
+        return new DataManagerResponse();
     }
 
     @Override
@@ -278,15 +278,15 @@ public class PersonDBManager implements OwnedDataManager<Person> {
     }
 
     @Override
-    public DataManagerResponse<Person> updateID(User user, int id, Person person) {
+    public DataManagerResponse updateID(User user, int id, Person person) {
         if (!isPresent(id)) {
-            return new DataManagerResponse<>(false, String.format("No element with id %d is present", id));
+            return new DataManagerResponse(false, String.format("No element with id %d is present", id));
         }
         if (!userManager.isRegisteredUser(user)) {
-            return new DataManagerResponse<>(false, INVALID_USER_MESSAGE);
+            return new DataManagerResponse(false, INVALID_USER_MESSAGE);
         }
         if (!isOwner(user, id)) {
-            return new DataManagerResponse<>(false, "Person is owned by another user");
+            return new DataManagerResponse(false, "Person is owned by another user");
         }
         try (PreparedStatement statement = connection.prepareStatement(PREPARED_UPDATE_QUERY)) {
             int i = 1;
@@ -306,10 +306,10 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             statement.execute();
         } catch (SQLException e) {
             LOGGER.error("Failed to update person: {}", e.getMessage());
-            return new DataManagerResponse<>(false, "An error occured when trying to update person");
+            return new DataManagerResponse(false, "An error occured when trying to update person");
         }
         collectionManager.updateID(id, person);
-        return new DataManagerResponse<>();
+        return new DataManagerResponse();
     }
 
     @Override
@@ -318,9 +318,9 @@ public class PersonDBManager implements OwnedDataManager<Person> {
     }
 
     @Override
-    public DataManagerResponse<Person> clear(User user) {
+    public DataManagerResponse clear(User user) {
         if (!userManager.isRegisteredUser(user)) {
-            return new DataManagerResponse<>(false, INVALID_USER_MESSAGE);
+            return new DataManagerResponse(false, INVALID_USER_MESSAGE);
         }
         try (PreparedStatement statement = connection
                 .prepareStatement("DELETE FROM persons WHERE owner_name = ? RETURNING id;")) {
@@ -336,9 +336,9 @@ public class PersonDBManager implements OwnedDataManager<Person> {
 
         } catch (SQLException e) {
             LOGGER.error("Failed to delete person: {}", e.getMessage());
-            return new DataManagerResponse<>(false, "An error occured when trying to delete person");
+            return new DataManagerResponse(false, "An error occured when trying to delete person");
         }
-        return new DataManagerResponse<>();
+        return new DataManagerResponse();
     }
 
     @Override

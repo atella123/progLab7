@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
+import lab.common.data.DataManagerResponse;
 import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
@@ -28,10 +29,14 @@ public final class Update extends AbstractDataCommand {
         Integer id = (Integer) args[0];
         Optional<Person> personToUpdate = getManager().getByID(id);
         if (personToUpdate.isPresent()) {
-            getManager().updateID(user, personToUpdate.get().getID(), (Person) args[1]);
+            DataManagerResponse dataManagerResponse = getManager().updateID(user, personToUpdate.get().getID(),
+                    (Person) args[1]);
+            if (!dataManagerResponse.isSuccess()) {
+                return new CommandResponse(CommandResult.ERROR, dataManagerResponse.getMessage());
+            }
             return new CommandResponse(CommandResult.SUCCESS);
         }
-        return new CommandResponse(CommandResult.ERROR, "No element with id (" + id + ") is present");
+        return new CommandResponse(CommandResult.ERROR, String.format("No element with id (%d) is present", id));
     }
 
     @Override

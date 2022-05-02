@@ -2,6 +2,7 @@ package lab.common.data.commands;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
+import lab.common.data.DataManagerResponse;
 import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
@@ -20,7 +21,10 @@ public final class Clear extends AbstractDataCommand {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
-        getManager().clear(user);
+        DataManagerResponse dataManagerResponse = getManager().clear(user);
+        if (!dataManagerResponse.isSuccess()) {
+            return new CommandResponse(CommandResult.ERROR, dataManagerResponse.getMessage());
+        }
         return new CommandResponse(CommandResult.SUCCESS);
     }
 
