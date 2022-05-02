@@ -1,18 +1,16 @@
-package lab.common.data.commands;
+package lab.common.commands.datacommands;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.data.DataManagerResponse;
-import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
-public final class RemoveGreater extends AbstractDataCommand {
+public final class AddIfMax extends AbstractDataCommand {
 
-    public RemoveGreater() {
+    public AddIfMax() {
         super();
     }
 
-    public RemoveGreater(OwnedDataManager<Person> manager) {
+    public AddIfMax(OwnedDataManager<Person> manager) {
         super(manager);
     }
 
@@ -25,7 +23,8 @@ public final class RemoveGreater extends AbstractDataCommand {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         Person p = (Person) args[0];
-        DataManagerResponse dataManagerResponse = getManager().removeMatches(user, p2 -> p.compareTo(p2) < 0);
+        DataManagerResponse dataManagerResponse = getManager()
+                .addIfAllMatches(user, p, p2 -> p2.compareTo(p) < 0);
         if (!dataManagerResponse.isSuccess()) {
             return new CommandResponse(CommandResult.ERROR, dataManagerResponse.getMessage());
         }
@@ -34,12 +33,12 @@ public final class RemoveGreater extends AbstractDataCommand {
 
     @Override
     public String toString() {
-        return "RemoveGreater";
+        return "AddIfMax";
     }
 
     @Override
     public String getMan() {
-        return "remove_greater {element} : удалить из коллекции все элементы, превышающие заданный";
+        return "add_if_max {element} : добавить новый элемент в коллекцию, если его значение превышает значение наибольшего элемента этой коллекции";
     }
 
     @Override
@@ -52,5 +51,4 @@ public final class RemoveGreater extends AbstractDataCommand {
         return new Class<?>[] {
                 Person.class };
     }
-
 }

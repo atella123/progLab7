@@ -1,11 +1,9 @@
-package lab.common.data;
+package lab.common.commands.datacommands;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Predicate;
-
-import lab.common.data.commands.User;
 
 public interface OwnedDataManager<T> {
 

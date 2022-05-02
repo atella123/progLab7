@@ -1,11 +1,9 @@
-package lab.common.data.commands;
+package lab.common.commands.datacommands;
 
 import java.util.Optional;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.data.DataManagerResponse;
-import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
 public final class Update extends AbstractDataCommand {

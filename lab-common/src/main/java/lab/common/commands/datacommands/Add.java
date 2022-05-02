@@ -1,18 +1,16 @@
-package lab.common.data.commands;
+package lab.common.commands.datacommands;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.data.DataManagerResponse;
-import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
-public final class RemoveByID extends AbstractDataCommand {
+public final class Add extends AbstractDataCommand {
 
-    public RemoveByID() {
+    public Add() {
         super();
     }
 
-    public RemoveByID(OwnedDataManager<Person> manager) {
+    public Add(OwnedDataManager<Person> manager) {
         super(manager);
     }
 
@@ -24,33 +22,33 @@ public final class RemoveByID extends AbstractDataCommand {
         if (!isVaildArgument(args)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
-        Integer id = (Integer) args[0];
-        DataManagerResponse dataResp = getManager().removeByID(user, id);
-        if (!dataResp.isSuccess()) {
-            return new CommandResponse(CommandResult.SUCCESS);
+        Person p = (Person) args[0];
+        DataManagerResponse dataManagerResponse = getManager().add(user, p);
+        if (!dataManagerResponse.isSuccess()) {
+            return new CommandResponse(CommandResult.ERROR, dataManagerResponse.getMessage());
         }
-        return new CommandResponse(CommandResult.ERROR, dataResp.getMessage());
-
+        return new CommandResponse(CommandResult.SUCCESS);
     }
 
     @Override
     public String toString() {
-        return "RemoveByID";
+        return "Add";
     }
 
     @Override
     public String getMan() {
-        return "remove_by_id id : удалить элемент из коллекции по его id";
+        return "add {element} : добавить новый элемент в коллекцию";
     }
 
     @Override
     public boolean isVaildArgument(Object... args) {
-        return args.length > 0 && args[0] instanceof Integer;
+        return args.length > 0 && args[0] instanceof Person;
     }
 
     @Override
     public Class<?>[] getArgumentClasses() {
         return new Class<?>[] {
-                Integer.class };
+                Person.class };
     }
+
 }

@@ -1,4 +1,4 @@
-package lab.common.data;
+package lab.common.commands.datacommands;
 
 public class DataManagerResponse {
 

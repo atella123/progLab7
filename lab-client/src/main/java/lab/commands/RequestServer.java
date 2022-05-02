@@ -5,9 +5,9 @@ import java.util.Map;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
+import lab.common.commands.datacommands.DataCommand;
+import lab.common.commands.datacommands.User;
 import lab.common.commands.AbstractCommand;
-import lab.common.data.commands.DataCommand;
-import lab.common.data.commands.User;
 import lab.common.io.IOManager;
 import lab.common.util.ArgumentParser;
 import lab.common.util.DataCommandExecuteRequest;

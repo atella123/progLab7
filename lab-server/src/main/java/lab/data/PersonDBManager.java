@@ -17,14 +17,14 @@ import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import lab.common.commands.datacommands.DataManagerResponse;
+import lab.common.commands.datacommands.OwnedDataManager;
+import lab.common.commands.datacommands.User;
 import lab.common.data.Color;
 import lab.common.data.Coordinates;
 import lab.common.data.Country;
-import lab.common.data.DataManagerResponse;
-import lab.common.data.OwnedDataManager;
 import lab.common.data.Location;
 import lab.common.data.Person;
-import lab.common.data.commands.User;
 import lab.util.UserDBManager;
 
 public class PersonDBManager implements OwnedDataManager<Person> {

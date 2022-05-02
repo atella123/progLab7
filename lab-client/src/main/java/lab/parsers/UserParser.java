@@ -4,8 +4,8 @@ import java.util.Objects;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.data.commands.RegisterUserConnection;
-import lab.common.data.commands.User;
+import lab.common.commands.datacommands.RegisterUserConnection;
+import lab.common.commands.datacommands.User;
 import lab.common.io.IOManager;
 import lab.common.io.Writter;
 import lab.common.util.DataCommandExecuteRequest;

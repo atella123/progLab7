@@ -1,4 +1,4 @@
-package lab.common.data.commands;
+package lab.common.commands.datacommands;
 
 import java.io.Serializable;
 

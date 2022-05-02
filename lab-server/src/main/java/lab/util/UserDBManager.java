@@ -5,7 +5,7 @@ import java.sql.Statement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import lab.common.data.commands.User;
+import lab.common.commands.datacommands.User;
 import lab.common.util.UserManager;
 
 import java.security.MessageDigest;

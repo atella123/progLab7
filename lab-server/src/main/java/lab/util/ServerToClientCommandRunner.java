@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.data.commands.DataCommand;
+import lab.common.commands.datacommands.DataCommand;
 import lab.common.io.IOManager;
 import lab.common.util.CommandRunner;
 import lab.common.util.DataCommandExecuteRequest;

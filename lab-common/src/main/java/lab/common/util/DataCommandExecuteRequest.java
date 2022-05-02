@@ -2,8 +2,8 @@ package lab.common.util;
 
 import java.io.Serializable;
 
-import lab.common.data.commands.DataCommand;
-import lab.common.data.commands.User;
+import lab.common.commands.datacommands.DataCommand;
+import lab.common.commands.datacommands.User;
 
 public final class DataCommandExecuteRequest implements Serializable {
 

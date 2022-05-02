@@ -1,4 +1,4 @@
-package lab.common.data.commands;
+package lab.common.commands.datacommands;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
 public final class SaveToFile extends AbstractDataCommand {

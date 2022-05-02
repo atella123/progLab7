@@ -15,19 +15,19 @@ import org.apache.logging.log4j.Logger;
 import lab.common.commands.Command;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.Exit;
-import lab.common.data.commands.Add;
-import lab.common.data.commands.AddIfMax;
-import lab.common.data.commands.Clear;
-import lab.common.data.commands.DataCommand;
-import lab.common.data.commands.FilterLessThanNationality;
-import lab.common.data.commands.GroupCountingByPassportID;
-import lab.common.data.commands.Info;
-import lab.common.data.commands.MinByCoordinates;
-import lab.common.data.commands.RegisterUserConnection;
-import lab.common.data.commands.RemoveByID;
-import lab.common.data.commands.RemoveGreater;
-import lab.common.data.commands.Show;
-import lab.common.data.commands.Update;
+import lab.common.commands.datacommands.Add;
+import lab.common.commands.datacommands.AddIfMax;
+import lab.common.commands.datacommands.Clear;
+import lab.common.commands.datacommands.DataCommand;
+import lab.common.commands.datacommands.FilterLessThanNationality;
+import lab.common.commands.datacommands.GroupCountingByPassportID;
+import lab.common.commands.datacommands.Info;
+import lab.common.commands.datacommands.MinByCoordinates;
+import lab.common.commands.datacommands.RegisterUserConnection;
+import lab.common.commands.datacommands.RemoveByID;
+import lab.common.commands.datacommands.RemoveGreater;
+import lab.common.commands.datacommands.Show;
+import lab.common.commands.datacommands.Update;
 import lab.common.io.IOManager;
 import lab.common.util.ArgumentParser;
 import lab.common.util.CommandRunner;
@@ -53,7 +53,7 @@ public final class Server {
             return;
         }
 
-        PersonDBManager manager = createDBManager("jdbc:postgresql://localhost:5432/lab7?characterEncoding=utf8",
+        PersonDBManager manager = createDBManager("jdbc:postgresql://localhost:5432/lab7",
                 "postgres", "postgres", "MD2");
         DatagramChannelIOManager clientIOManager = createDatagramChannelIOManager(port);
 
@@ -81,8 +81,7 @@ public final class Server {
 
     public static PersonDBManager createDBManager(String url, String user, String password, String messageDigest) {
         try {
-            return new PersonDBManager(url, user,
-                    password, MessageDigest.getInstance(messageDigest));
+            return new PersonDBManager(url, user, password, MessageDigest.getInstance(messageDigest));
         } catch (SQLException e) {
             LOGGER.error("Couldn't connect to DB: {}", e.getMessage());
         } catch (NoSuchAlgorithmException e) {

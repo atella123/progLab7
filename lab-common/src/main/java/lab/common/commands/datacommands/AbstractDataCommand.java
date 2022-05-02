@@ -1,6 +1,5 @@
-package lab.common.data.commands;
+package lab.common.commands.datacommands;
 
-import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
 public abstract class AbstractDataCommand implements DataCommand {

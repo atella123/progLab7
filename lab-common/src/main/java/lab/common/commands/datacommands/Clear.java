@@ -1,18 +1,16 @@
-package lab.common.data.commands;
+package lab.common.commands.datacommands;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.data.DataManagerResponse;
-import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
-public final class Add extends AbstractDataCommand {
+public final class Clear extends AbstractDataCommand {
 
-    public Add() {
+    public Clear() {
         super();
     }
 
-    public Add(OwnedDataManager<Person> manager) {
+    public Clear(OwnedDataManager<Person> manager) {
         super(manager);
     }
 
@@ -21,11 +19,7 @@ public final class Add extends AbstractDataCommand {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
-        if (!isVaildArgument(args)) {
-            return new CommandResponse(CommandResult.ERROR, "Illegal argument");
-        }
-        Person p = (Person) args[0];
-        DataManagerResponse dataManagerResponse = getManager().add(user, p);
+        DataManagerResponse dataManagerResponse = getManager().clear(user);
         if (!dataManagerResponse.isSuccess()) {
             return new CommandResponse(CommandResult.ERROR, dataManagerResponse.getMessage());
         }
@@ -34,23 +28,20 @@ public final class Add extends AbstractDataCommand {
 
     @Override
     public String toString() {
-        return "Add";
+        return "Clear";
     }
 
-    @Override
     public String getMan() {
-        return "add {element} : добавить новый элемент в коллекцию";
+        return "clear : очистить коллекцию";
     }
 
     @Override
     public boolean isVaildArgument(Object... args) {
-        return args.length > 0 && args[0] instanceof Person;
+        return true;
     }
 
     @Override
     public Class<?>[] getArgumentClasses() {
-        return new Class<?>[] {
-                Person.class };
+        return new Class<?>[0];
     }
-
 }

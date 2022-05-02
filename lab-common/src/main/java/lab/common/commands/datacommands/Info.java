@@ -1,8 +1,7 @@
-package lab.common.data.commands;
+package lab.common.commands.datacommands;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
 public final class Info extends AbstractDataCommand {

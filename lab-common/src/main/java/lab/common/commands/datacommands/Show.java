@@ -1,18 +1,16 @@
-package lab.common.data.commands;
+package lab.common.commands.datacommands;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.data.DataManagerResponse;
-import lab.common.data.OwnedDataManager;
 import lab.common.data.Person;
 
-public final class Clear extends AbstractDataCommand {
+public final class Show extends AbstractDataCommand {
 
-    public Clear() {
+    public Show() {
         super();
     }
 
-    public Clear(OwnedDataManager<Person> manager) {
+    public Show(OwnedDataManager<Person> manager) {
         super(manager);
     }
 
@@ -21,20 +19,19 @@ public final class Clear extends AbstractDataCommand {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
-        DataManagerResponse dataManagerResponse = getManager().clear(user);
-        if (!dataManagerResponse.isSuccess()) {
-            return new CommandResponse(CommandResult.ERROR, dataManagerResponse.getMessage());
-        }
-        return new CommandResponse(CommandResult.SUCCESS);
+
+        return new CommandResponse(CommandResult.SUCCESS, "Person manager elements:",
+                getManager().getAsCollection().toArray(new Person[0]));
     }
 
     @Override
     public String toString() {
-        return "Clear";
+        return "Show";
     }
 
+    @Override
     public String getMan() {
-        return "clear : очистить коллекцию";
+        return "show : вывести в стандартный поток вывода все элементы коллекции в строковом представлении";
     }
 
     @Override

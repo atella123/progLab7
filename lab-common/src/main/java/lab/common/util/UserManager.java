@@ -1,6 +1,6 @@
 package lab.common.util;
 
-import lab.common.data.commands.User;
+import lab.common.commands.datacommands.User;
 
 public interface UserManager {
 
