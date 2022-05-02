@@ -1,5 +1,6 @@
 package lab.data;
 
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -19,60 +20,61 @@ import org.apache.logging.log4j.Logger;
 import lab.common.data.Color;
 import lab.common.data.Coordinates;
 import lab.common.data.Country;
-import lab.common.data.DataManager;
+import lab.common.data.DataManagerResponse;
+import lab.common.data.OwnedDataManager;
 import lab.common.data.Location;
 import lab.common.data.Person;
+import lab.common.data.commands.User;
+import lab.util.UserDBManager;
 
-public class PersonDBManager implements DataManager<Person> {
+public class PersonDBManager implements OwnedDataManager<Person> {
 
     private static final Logger LOGGER = LogManager.getLogger(lab.data.PersonDBManager.class);
 
-    private static final String INIT_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS Users("
-            + "id SERIAL PRIMARY KEY,"
-            + "name VARCHAR(30) NOT NULL,"
-            + "password VARCHAR(30) NOT NULL);"
-            + "CREATE TABLE IF NOT EXISTS Persons("
-            + "id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
-            + "name TEXT NOT NULL,"
-            + "coordinates_x REAL NOT NULL,"
-            + "coordinates_y INT NOT NULL,"
-            + "creation_date DATE NOT NULL,"
-            + "height INT NOT NULL,"
-            + "passport_id TEXT NOT NULL,"
-            + "eye_color VARCHAR(10) NOT NULL,"
-            + "country VARCHAR(20) NOT NULL,"
-            + "location_x REAL NOT NULL,"
-            + "location_y BIGINT NOT NULL,"
+    private static final String INIT_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS Persons("
+            + "id INT PRIMARY KEY, owner_name VARCHAR(30),"
+            + "name TEXT, coordinates_x REAL NOT NULL,"
+            + "coordinates_y INT NOT NULL, creation_date DATE NOT NULL,"
+            + "height INT NOT NULL, passport_id TEXT NOT NULL,"
+            + "eye_color VARCHAR(10) NOT NULL, country VARCHAR(20) NOT NULL,"
+            + "location_x REAL NOT NULL, location_y BIGINT NOT NULL,"
             + "location_name TEXT NOT NULL,"
-            + "CONSTRAINT owner_id FOREIGN KEY(id) "
-            + "REFERENCES users(id));";
+            + "CONSTRAINT owner FOREIGN KEY(owner_name) REFERENCES users(name) ON DELETE SET NULL);"
+            + "CREATE SEQUENCE IF NOT EXISTS personID OWNED BY persons.id";
 
-    private static final String PREPARED_INSERT_QUERY = "INSERT INTO persons (name,"
+    private static final String PREPARED_INSERT_QUERY = "INSERT INTO persons (id, name, owner_name,"
             + "coordinates_x,coordinates_y,creation_date,"
             + "height,passport_id,eye_color,country,"
             + "location_x,location_y,location_name)"
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
     private static final String PREPARED_UPDATE_QUERY = "UPDATE persons SET name = ?,"
             + "coordinates_x = ?,coordinates_y = ?,creation_date = ?,"
             + "height = ?,passport_id = ?,eye_color = ?,country = ?,"
             + "location_x = ?,location_y = ?,location_name = ?"
-            + "WHERE id = ?";
+            + "WHERE id = ?;";
+
+    private static final String INVALID_USER_MESSAGE = "Invalid username or password";
 
     private final Connection connection;
+    private final UserDBManager userManager;
     private final PersonCollectionManager collectionManager;
     private final LocalDate timestamp = LocalDate.now();
 
-    public PersonDBManager(Connection connection) throws SQLException {
+    public PersonDBManager(Connection connection, MessageDigest hashFunction) throws SQLException {
         this.connection = connection;
+        this.userManager = new UserDBManager(connection, hashFunction);
+        this.collectionManager = new PersonCollectionManager();
         createTable();
-        this.collectionManager = new PersonCollectionManager(getCollectionFromDB());
+        setCollectionFromDB();
     }
 
-    public PersonDBManager(String url, String user, String password) throws SQLException {
+    public PersonDBManager(String url, String user, String password, MessageDigest hashFunction) throws SQLException {
         this.connection = DriverManager.getConnection(url, user, password);
+        this.userManager = new UserDBManager(connection, hashFunction);
+        this.collectionManager = new PersonCollectionManager();
         createTable();
-        this.collectionManager = new PersonCollectionManager(getCollectionFromDB());
+        setCollectionFromDB();
     }
 
     private void createTable() throws SQLException {
@@ -81,7 +83,7 @@ public class PersonDBManager implements DataManager<Person> {
         }
     }
 
-    private Collection<Person> getCollectionFromDB() throws SQLException {
+    private void setCollectionFromDB() throws SQLException {
         HashSet<Person> collection = new HashSet<>();
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM persons");
@@ -89,7 +91,7 @@ public class PersonDBManager implements DataManager<Person> {
                 collection.add(getPersonFromResult(resultSet));
             }
         }
-        return collection;
+        collectionManager.setCollection(collection);
     }
 
     private Person getPersonFromResult(ResultSet result) throws SQLException {
@@ -97,7 +99,7 @@ public class PersonDBManager implements DataManager<Person> {
 
         builder.setId(result.getInt("id"));
         builder.setName(result.getString("name"));
-        builder.setHeigth(result.getInt("height"));
+        builder.setHeight(result.getInt("height"));
         builder.setCreationDate(result.getDate("creation_date").toLocalDate());
         builder.setPassportID(result.getString("passport_id"));
         builder.setEyeColor(Color.valueOf(result.getString("eye_color").toUpperCase()));
@@ -115,86 +117,154 @@ public class PersonDBManager implements DataManager<Person> {
         return builder.build();
     }
 
+    private boolean isPresent(int id) {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT EXISTS(SELECT 1 FROM persons WHERE id = ?);")) {
+
+            statement.setInt(1, id);
+
+            statement.execute();
+
+            ResultSet result = statement.getResultSet();
+
+            result.next();
+
+            return result.getBoolean(1);
+
+        } catch (SQLException e) {
+            LOGGER.error("Check if person exists in DB failed: {}", e.getMessage());
+        }
+        return false;
+    }
+
+    private boolean isOwner(User user, int id) {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT * FROM users WHERE name = (SELECT owner_name FROM persons WHERE id = ?)")) {
+
+            statement.setInt(1, id);
+            statement.execute();
+
+            ResultSet result = statement.getResultSet();
+            result.next();
+
+            return userManager.compareUsers(user, new User(result.getString(1), result.getString(2)));
+
+        } catch (SQLException e) {
+            LOGGER.error("Couldn't check if {} is owner of Person with id {}: {}", user.getUsername(), id,
+                    e.getMessage());
+        }
+        return false;
+    }
+
     public boolean allMatches(Predicate<Person> predicate) {
         return collectionManager.allMatches(predicate);
     }
 
     @Override
-    public boolean add(Person person) {
-        try (PreparedStatement statement = connection.prepareStatement(PREPARED_INSERT_QUERY)) {
+    public DataManagerResponse<Person> add(User user, Person person) {
+
+        if (!userManager.isRegisteredUser(user)) {
+            return new DataManagerResponse<>(true, "Couldn't add person to DB, user doens't exist");
+        }
+
+        try (Statement statement = connection.createStatement();
+                PreparedStatement insertStatement = connection.prepareStatement(PREPARED_INSERT_QUERY)) {
             int i = 1;
 
-            statement.setString(i++, person.getName());
-            statement.setFloat(i++, person.getCoordinates().getX());
-            statement.setInt(i++, person.getCoordinates().getY());
-            statement.setDate(i++, Date.valueOf(person.getCreationDate()));
-            statement.setInt(i++, person.getHeight());
-            statement.setString(i++, person.getPassportID());
-            statement.setString(i++, person.getEyeColor().toString());
-            statement.setString(i++, person.getNationality().toString());
-            statement.setFloat(i++, person.getLocation().getX());
-            statement.setLong(i++, person.getLocation().getY());
-            statement.setString(i++, person.getLocation().getName());
+            ResultSet result = statement.executeQuery("SELECT nextval('personID');");
 
-            statement.execute();
-            collectionManager.add(person);
+            result.next();
 
+            insertStatement.setInt(i++, result.getInt(1));
+            insertStatement.setString(i++, person.getName());
+            insertStatement.setString(i++, user.getUsername());
+            insertStatement.setFloat(i++, person.getCoordinates().getX());
+            insertStatement.setInt(i++, person.getCoordinates().getY());
+            insertStatement.setDate(i++, Date.valueOf(person.getCreationDate()));
+            insertStatement.setInt(i++, person.getHeight());
+            insertStatement.setString(i++, person.getPassportID());
+            insertStatement.setString(i++, person.getEyeColor().toString());
+            insertStatement.setString(i++, person.getNationality().toString());
+            insertStatement.setFloat(i++, person.getLocation().getX());
+            insertStatement.setLong(i++, person.getLocation().getY());
+            insertStatement.setString(i, person.getLocation().getName());
+
+            insertStatement.execute();
+
+            collectionManager.add(new Person.Builder(person).setId(result.getInt(1)).build());
         } catch (SQLException e) {
-            LOGGER.error("An error occuried while trying to write to database: {}", e.getMessage());
-            return false;
+            LOGGER.error("An error occurred while trying to write to database: {}", e.getMessage());
+            return new DataManagerResponse<>(false, "An error occurred while trying to add person");
         }
-        return true;
+
+        return new DataManagerResponse<>();
     }
 
     @Override
-    public boolean addIfAllMatches(Person person, Predicate<Person> predicate) {
-        if (!allMatches(predicate) || !add(person)) {
-            return false;
+    public DataManagerResponse<Person> addIfAllMatches(User user, Person person, Predicate<Person> predicate) {
+        if (!allMatches(predicate)) {
+            return new DataManagerResponse<>();
         }
-        collectionManager.add(person);
-        return true;
+        return add(user, person);
     }
 
     @Override
-    public void remove(Person person) {
-        removeByID(person.getID());
+    public DataManagerResponse<Person> remove(User user, Person person) {
+        return removeByID(user, person.getID());
     }
 
     @Override
-    public void removeAll(Collection<Person> collectionToRemove) {
+    public DataManagerResponse<Person> removeAll(User user, Collection<Person> collectionToRemove) {
         for (Person person : collectionToRemove) {
-            removeByID(person.getID());
+            removeByID(user, person.getID());
         }
+        return new DataManagerResponse<>();
     }
 
+    // Здесь пришлось редактировать конфиг чекстайла, ибо как небольно сделать 4
+    // точки выхода придумать не получилось
     @Override
-    public boolean removeByID(int id) {
-        if (!collectionManager.getByID(id).isPresent()) {
-            return false;
+    public DataManagerResponse<Person> removeByID(User user, int id) {
+        if (!isPresent(id)) {
+            return new DataManagerResponse<>(false, String.format("No element with id %d is present", id));
         }
-        try (PreparedStatement statement = connection.prepareStatement("DELETE FROM persons WHERE id = ?")) {
+        if (!userManager.isRegisteredUser(user)) {
+            return new DataManagerResponse<>(false, INVALID_USER_MESSAGE);
+        }
+        if (!isOwner(user, id)) {
+            return new DataManagerResponse<>(false, "Person is owned by another user");
+        }
+
+        try (PreparedStatement statement = connection.prepareStatement(
+                "DELETE FROM persons WHERE id = ? RETURNING id")) {
             statement.setInt(1, id);
             statement.execute();
+
+            ResultSet result = statement.getResultSet();
+
+            if (result.next()) {
+                collectionManager.removeByID(id);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return new DataManagerResponse<>(false, "An error occured when trying to delete person");
         }
-        collectionManager.removeByID(id);
-        return true;
+        return new DataManagerResponse<>();
+
     }
 
     @Override
-    public void removeMatches(Predicate<Person> predicate) {
-        removeAll(getMatches(predicate));
+    public DataManagerResponse<Person> removeMatches(User user, Predicate<Person> predicate) {
+        return removeAll(user, getMatches(predicate));
     }
 
     @Override
-    public boolean removeIfAllMatches(Person person, Predicate<Person> predicate) {
-        if (!allMatches(predicate)) {
-            return false;
+    public DataManagerResponse<Person> removeIfAllMatches(User user, Person person, Predicate<Person> predicate) {
+        if (allMatches(predicate)) {
+            return remove(user, person);
         }
-        remove(person);
-        return true;
+        return new DataManagerResponse<>();
     }
 
     @Override
@@ -208,9 +278,15 @@ public class PersonDBManager implements DataManager<Person> {
     }
 
     @Override
-    public boolean updateID(int id, Person person) {
-        if (!collectionManager.updateID(id, person)) {
-            return false;
+    public DataManagerResponse<Person> updateID(User user, int id, Person person) {
+        if (!isPresent(id)) {
+            return new DataManagerResponse<>(false, String.format("No element with id %d is present", id));
+        }
+        if (!userManager.isRegisteredUser(user)) {
+            return new DataManagerResponse<>(false, INVALID_USER_MESSAGE);
+        }
+        if (!isOwner(user, id)) {
+            return new DataManagerResponse<>(false, "Person is owned by another user");
         }
         try (PreparedStatement statement = connection.prepareStatement(PREPARED_UPDATE_QUERY)) {
             int i = 1;
@@ -226,28 +302,43 @@ public class PersonDBManager implements DataManager<Person> {
             statement.setLong(i++, person.getLocation().getY());
             statement.setString(i++, person.getLocation().getName());
 
-            statement.setInt(i++, id);
+            statement.setInt(i, id);
             statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return new DataManagerResponse<>(false, "An error occured when trying to update person");
         }
-        return true;
+        collectionManager.updateID(id, person);
+        return new DataManagerResponse<>();
     }
 
     @Override
     public Collection<Person> getAsCollection() {
-        return collectionManager.getAsCollection();
+        return collectionManager.getCollection();
     }
 
     @Override
-    public void clear() {
-        try (Statement statement = connection.createStatement()) {
-            statement.execute("TRUNCATE TABLE");
+    public DataManagerResponse<Person> clear(User user) {
+        if (!userManager.isRegisteredUser(user)) {
+            return new DataManagerResponse<>(false, INVALID_USER_MESSAGE);
+        }
+        try (PreparedStatement statement = connection
+                .prepareStatement("DELETE FROM persons WHERE owner_name = ? RETURNING id;")) {
+            statement.setString(1, user.getUsername());
+
+            statement.execute();
+
+            ResultSet result = statement.getResultSet();
+
+            while (result.next()) {
+                collectionManager.removeByID(result.getInt(1));
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
+            return new DataManagerResponse<>(false, "An error occured when trying to delete person");
         }
-        collectionManager.clear();
+        return new DataManagerResponse<>();
     }
 
     @Override
@@ -258,6 +349,10 @@ public class PersonDBManager implements DataManager<Person> {
     @Override
     public String getDataSourceType() {
         return collectionManager.getDataSourceType();
+    }
+
+    public UserDBManager getUserManager() {
+        return userManager;
     }
 
 }

@@ -14,12 +14,12 @@ import java.net.SocketTimeoutException;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.io.IOManager;
-import lab.common.util.CommandWithArguments;
+import lab.common.util.DataCommandExecuteRequest;
 
-public class DatagramSocketIOManager extends IOManager<CommandResponse, CommandWithArguments> {
+public class DatagramSocketIOManager extends IOManager<CommandResponse, DataCommandExecuteRequest> {
 
     private static final int MAX_PACKAGE_SIZE = 65507;
-    private static final int TIMEOUT = 1000;
+    private static final int TIMEOUT = 50000;
     private final InetSocketAddress serverAddress;
     private DatagramSocket socket;
 
@@ -61,7 +61,7 @@ public class DatagramSocketIOManager extends IOManager<CommandResponse, CommandW
         }
     }
 
-    private void writeCommandWithArgs(CommandWithArguments commandWithArgs) {
+    private void writeCommandWithArgs(DataCommandExecuteRequest commandWithArgs) {
         try {
             ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOutputStream);

@@ -2,11 +2,11 @@ package lab.parsers;
 
 import lab.common.data.Coordinates;
 import lab.common.io.IOManager;
-import lab.common.util.DataReader;
 
 public final class CoordinatesParser {
 
     private CoordinatesParser() {
+        throw new UnsupportedOperationException();
     }
 
     public static Coordinates parseCoordinates(IOManager<String, String> io) {

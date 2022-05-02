@@ -1,44 +1,52 @@
 package lab.commands;
 
 import java.util.Arrays;
+import java.util.Map;
 
-import lab.common.commands.AbstractCommand;
-import lab.common.commands.Command;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.util.CommandManager;
-import lab.common.util.CommandRunner;
-import lab.common.util.CommandWithArguments;
-import lab.io.DatagramSocketIOManager;
-import lab.common.users.User;
+import lab.common.commands.AbstractCommand;
+import lab.common.data.commands.DataCommand;
+import lab.common.data.commands.User;
+import lab.common.io.IOManager;
+import lab.common.util.ArgumentParser;
+import lab.common.util.DataCommandExecuteRequest;
 
-public final class RequestServer<R, C> extends AbstractCommand {
+public final class RequestServer extends AbstractCommand {
 
-    private final DatagramSocketIOManager io;
-    private final CommandRunner<R, C> toServerCommandRunner;
+    private final User user;
+    private final IOManager<CommandResponse, DataCommandExecuteRequest> io;
+    private final Map<String, DataCommand> commandsMap;
+    private final ArgumentParser<String> argumentParser;
 
-    public RequestServer(DatagramSocketIOManager io, CommandRunner<R, C> toServerCommandRunner) {
+    public RequestServer(User user, IOManager<CommandResponse, DataCommandExecuteRequest> io,
+            Map<String, DataCommand> commandsMap,
+            ArgumentParser<String> argumentParser) {
         super(true);
+        this.user = user;
         this.io = io;
-        this.toServerCommandRunner = toServerCommandRunner;
+        this.commandsMap = commandsMap;
+        this.argumentParser = argumentParser;
     }
 
     @Override
-    public CommandResponse execute(User user, Object... args) {
+    public CommandResponse execute(Object... args) {
         if (!isVaildArgument(args)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
-        if (!toServerCommandRunner.getCommandManager().containsKey(args[0])) {
+        if (!commandsMap.containsValue(args[0])) {
             return new CommandResponse(CommandResult.ERROR, "Unknown command");
         }
-        Command command = toServerCommandRunner.getCommandManager().get(args[0]);
-        Object[] parsedArgs = toServerCommandRunner.parseArguments(command, Arrays.copyOfRange(args, 1, args.length));
+        DataCommand command = (DataCommand) args[0];
+        Object[] parsedArgs = argumentParser.parseArguments(command,
+                Arrays.copyOfRange(args, 1, args.length, String[].class));
         if (!command.isVaildArgument(parsedArgs)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
-        CommandWithArguments commandWithArguments = new CommandWithArguments(command.getClass(), parsedArgs);
+        DataCommandExecuteRequest commandWithArguments = new DataCommandExecuteRequest(user, command.getClass(),
+                parsedArgs);
         io.write(commandWithArguments);
-        return io.read();
+        return io.readLine();
     }
 
     @Override
@@ -49,7 +57,7 @@ public final class RequestServer<R, C> extends AbstractCommand {
     @Override
     public Class<?>[] getArgumentClasses() {
         return new Class[] {
-                Object.class };
+                DataCommand.class };
     }
 
     @Override
@@ -57,7 +65,9 @@ public final class RequestServer<R, C> extends AbstractCommand {
         return "request_server command_name arguments... : запросить сервер выполнить указанную комманду с указанными аргументами";
     }
 
-    public CommandManager<C> getCommandManager() {
-        return toServerCommandRunner.getCommandManager();
+    @Override
+    public String toString() {
+        return "RequestServer";
     }
+
 }

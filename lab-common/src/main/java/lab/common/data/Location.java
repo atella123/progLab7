@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import lab.common.exceptions.IllegalFieldValueException;
 
-public class Location implements Serializable {
+public final class Location implements Serializable {
     private Float x; // Поле не может быть null
     private long y;
     private String name; // Поле не может быть null

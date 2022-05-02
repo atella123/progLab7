@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import lab.common.exceptions.IllegalFieldValueException;
 
-public class Person implements Comparable<Person>, Serializable {
+public final class Person implements Comparable<Person>, Serializable {
 
     private Integer id; // Поле не может быть null, Значение поля должно быть больше 0, Значение этого
     // поля должно быть уникальным, Значение этого поля должно генерироваться
@@ -25,19 +25,6 @@ public class Person implements Comparable<Person>, Serializable {
     private Person() {
     }
 
-    public Person(String name, Coordinates coordinates, int height, String passportID, Color eyeColor,
-            Country nationality, Location location) {
-        setID(0);
-        setName(name);
-        setCoordinates(coordinates);
-        setCreationDate();
-        setHeight(height);
-        setPassportID(passportID);
-        setEyeColor(eyeColor);
-        setNationality(nationality);
-        setLocation(location);
-    }
-
     public Integer getID() {
         return id;
     }
@@ -50,83 +37,32 @@ public class Person implements Comparable<Person>, Serializable {
         return name;
     }
 
-    private void setName(String name) {
-        if (!Validator.isValidName(name)) {
-            throw new IllegalFieldValueException();
-        }
-        this.name = name;
-    }
-
     public Coordinates getCoordinates() {
         return coordinates;
-    }
-
-    private void setCoordinates(Coordinates coordinates) {
-        if (!Validator.isValidCoordinates(coordinates)) {
-            throw new IllegalFieldValueException();
-        }
-        this.coordinates = coordinates;
     }
 
     public java.time.LocalDate getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate() {
-        creationDate = LocalDate.now();
-    }
-
-    public void setCreationDate(LocalDate creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public int getHeight() {
         return height;
-    }
-
-    private void setHeight(int height) {
-        if (!Validator.isValidHeight(height)) {
-            throw new IllegalFieldValueException();
-        }
-        this.height = height;
     }
 
     public String getPassportID() {
         return passportID;
     }
 
-    private void setPassportID(String passportID) {
-        if (!Validator.isValidPassportID(passportID)) {
-            throw new IllegalFieldValueException();
-        }
-        this.passportID = passportID;
-    }
-
     public Color getEyeColor() {
         return eyeColor;
-    }
-
-    private void setEyeColor(Color eyeColor) {
-        this.eyeColor = eyeColor;
     }
 
     public Country getNationality() {
         return nationality;
     }
 
-    private void setNationality(Country nationality) {
-        this.nationality = nationality;
-    }
-
     public Location getLocation() {
         return location;
-    }
-
-    private void setLocation(Location location) {
-        if (!Validator.isValidLocation(location)) {
-            throw new IllegalFieldValueException();
-        }
-        this.location = location;
     }
 
     @Override
@@ -237,27 +173,54 @@ public class Person implements Comparable<Person>, Serializable {
             this.person = new Person();
         }
 
+        public Builder(Person person) {
+            this.person = new Person();
+            this.person.id = person.id;
+            this.person.name = person.name;
+            this.person.coordinates = person.coordinates;
+            this.person.creationDate = person.creationDate;
+            this.person.height = person.height;
+            this.person.passportID = person.passportID;
+            this.person.height = person.height;
+            this.person.passportID = person.passportID;
+            this.person.eyeColor = person.eyeColor;
+            this.person.nationality = person.nationality;
+            this.person.location = person.location;
+        }
+
         public Builder setId(Integer id) {
             person.id = id;
             return this;
         }
 
         public Builder setName(String name) {
+            if (!Validator.isValidName(name)) {
+                throw new IllegalFieldValueException();
+            }
             person.name = name;
             return this;
         }
 
         public Builder setCoordinates(Coordinates coordinates) {
+            if (!Validator.isValidCoordinates(coordinates)) {
+                throw new IllegalFieldValueException();
+            }
             person.coordinates = coordinates;
             return this;
         }
 
-        public Builder setHeigth(int height) {
+        public Builder setHeight(int height) {
+            if (!Validator.isValidHeight(height)) {
+                throw new IllegalFieldValueException();
+            }
             person.height = height;
             return this;
         }
 
         public Builder setPassportID(String passportID) {
+            if (!Validator.isValidPassportID(passportID)) {
+                throw new IllegalFieldValueException();
+            }
             person.passportID = passportID;
             return this;
         }
@@ -273,6 +236,9 @@ public class Person implements Comparable<Person>, Serializable {
         }
 
         public Builder setLocation(Location location) {
+            if (!Validator.isValidLocation(location)) {
+                throw new IllegalFieldValueException();
+            }
             person.location = location;
             return this;
         }
@@ -283,17 +249,7 @@ public class Person implements Comparable<Person>, Serializable {
         }
 
         public Person build() {
-            Person newPerson = new Person();
-            newPerson.setID(person.id);
-            newPerson.setName(person.name);
-            newPerson.setCoordinates(person.coordinates);
-            newPerson.setCreationDate(person.creationDate);
-            newPerson.setHeight(person.height);
-            newPerson.setPassportID(person.passportID);
-            newPerson.setEyeColor(person.eyeColor);
-            newPerson.setNationality(person.nationality);
-            newPerson.setLocation(person.location);
-            return newPerson;
+            return person;
         }
     }
 }

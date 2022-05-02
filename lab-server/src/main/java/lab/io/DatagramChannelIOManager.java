@@ -17,9 +17,9 @@ import org.apache.logging.log4j.Logger;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.io.IOManager;
-import lab.common.util.CommandWithArguments;
+import lab.common.util.DataCommandExecuteRequest;
 
-public class DatagramChannelIOManager extends IOManager<CommandWithArguments, CommandResponse> {
+public class DatagramChannelIOManager extends IOManager<DataCommandExecuteRequest, CommandResponse> {
 
     private static final Logger LOGGER = LogManager.getLogger(lab.io.DatagramChannelIOManager.class);
     private static final int MAX_PACKAGE_SIZE = 65507;
@@ -34,7 +34,7 @@ public class DatagramChannelIOManager extends IOManager<CommandWithArguments, Co
         setWritter(this::writeResponse);
     }
 
-    private CommandWithArguments readCommandWithArgs() {
+    private DataCommandExecuteRequest readCommandWithArgs() {
         ByteBuffer inputPackages = ByteBuffer.wrap(new byte[MAX_PACKAGE_SIZE]);
         try {
             lastRemotAddress = datagramChannel.receive(inputPackages);
@@ -43,7 +43,7 @@ public class DatagramChannelIOManager extends IOManager<CommandWithArguments, Co
             }
             ObjectInputStream objectInputStream = new ObjectInputStream(
                     new ByteArrayInputStream(inputPackages.array()));
-            CommandWithArguments input = (CommandWithArguments) objectInputStream.readObject();
+            DataCommandExecuteRequest input = (DataCommandExecuteRequest) objectInputStream.readObject();
             if (Objects.nonNull(input)) {
                 LOGGER.info("New client request recivied from {} to execute {} command", lastRemotAddress,
                         input.getCommandClass().getSimpleName());

@@ -1,8 +1,12 @@
 package lab.common.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.function.Function;
 
+import lab.common.commands.BasicCommand;
 import lab.common.exceptions.NoParserAvailableException;
 
 public class ArgumentParser<T> {
@@ -29,6 +33,27 @@ public class ArgumentParser<T> {
             throw new NoParserAvailableException("For " + clazz);
         }
         return classParsers.get(clazz).apply(argument);
+    }
+
+    public Object[] parseArguments(BasicCommand command, T[] argumentsToParse) {
+        Class<?>[] argumentClasses = command.getArgumentClasses();
+        ArrayList<Object> parsedArguments = new ArrayList<>(argumentClasses.length);
+        parsedArguments.addAll(Arrays.asList(argumentsToParse));
+        if (argumentClasses.length > argumentsToParse.length) {
+            parsedArguments.addAll(Arrays.asList(new Object[argumentClasses.length - argumentsToParse.length]));
+        }
+        T nextArgumentToParse = null;
+        for (int i = 0; i < argumentClasses.length; i++) {
+            if (argumentsToParse.length > i) {
+                nextArgumentToParse = argumentsToParse[i];
+            }
+            Object nextArg = convert(argumentClasses[i], nextArgumentToParse);
+            if (Objects.isNull(nextArg)) {
+                return new Object[0];
+            }
+            parsedArguments.set(i, nextArg);
+        }
+        return parsedArguments.toArray();
     }
 
     public boolean canParse(Class<?> clazz) {

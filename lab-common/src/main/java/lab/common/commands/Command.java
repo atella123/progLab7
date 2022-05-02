@@ -1,15 +1,7 @@
 package lab.common.commands;
 
-import lab.common.users.User;
+public interface Command extends BasicCommand {
 
-public interface Command {
-
-    boolean isVaildArgument(Object... args);
-
-    Class<?>[] getArgumentClasses();
-
-    CommandResponse execute(User user, Object... args);
-
-    String getMan();
+    CommandResponse execute(Object... args);
 
 }

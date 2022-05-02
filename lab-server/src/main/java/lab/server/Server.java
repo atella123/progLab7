@@ -1,54 +1,39 @@
 package lab.server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 
-import com.google.gson.Gson;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import lab.commands.SaveAndExit;
-import lab.common.commands.Add;
-import lab.common.commands.AddIfMax;
-import lab.common.commands.Clear;
 import lab.common.commands.Command;
 import lab.common.commands.CommandResponse;
-import lab.common.commands.FilterLessThanNationality;
-import lab.common.commands.GroupCountingByPassportID;
-import lab.common.commands.Help;
-import lab.common.commands.History;
-import lab.common.commands.Info;
-import lab.common.commands.MinByCoordinates;
-import lab.common.commands.RemoveByID;
-import lab.common.commands.RemoveGreater;
-import lab.common.commands.SaveToFile;
-import lab.common.commands.Show;
-import lab.common.commands.Update;
-import lab.common.data.DataManager;
-import lab.common.data.Person;
+import lab.common.commands.Exit;
+import lab.common.data.commands.Add;
+import lab.common.data.commands.AddIfMax;
+import lab.common.data.commands.Clear;
+import lab.common.data.commands.DataCommand;
+import lab.common.data.commands.FilterLessThanNationality;
+import lab.common.data.commands.GroupCountingByPassportID;
+import lab.common.data.commands.Info;
+import lab.common.data.commands.MinByCoordinates;
+import lab.common.data.commands.RegisterUserConnection;
+import lab.common.data.commands.RemoveByID;
+import lab.common.data.commands.RemoveGreater;
+import lab.common.data.commands.Show;
+import lab.common.data.commands.Update;
 import lab.common.io.IOManager;
-import lab.common.json.DefalutGsonCreator;
 import lab.common.util.ArgumentParser;
-import lab.common.util.CommandManager;
 import lab.common.util.CommandRunner;
-import lab.common.util.DefaultCommandRunner;
 import lab.data.PersonDBManager;
 import lab.io.DatagramChannelIOManager;
-import lab.util.PersonCollectionServer;
+import lab.util.ServerCommandRunner;
 import lab.util.ServerToClientCommandRunner;
 
 public final class Server {
@@ -59,98 +44,65 @@ public final class Server {
         throw new UnsupportedOperationException("This is an utility class and can not be instantiated");
     }
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
 
-        Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/lab7", "postgres",
-                "postgres");
-
-        connection.createStatement().execute("INSERT INTO users(name, password) values('123','123')");
-
-        PreparedStatement s = connection.prepareStatement("SELECT id FROM users WHERE name = ?");
-
-        s.setString(1, "123");
-
-        ResultSet res = s.executeQuery();
-
-        res.next();
-
-        System.out.println(res.getString("id"));
-
-        // try {
-        // PersonDBManager dbManager = new
-        // PersonDBManager("jdbc:postgresql://localhost:5432/lab7", "postgres",
-        // "postgres");
-        // dbManager.add(new Person("123", new Coordinates(1f, 2), 123, "1234567890",
-        // Color.BLUE, Country.CHINA,
-        // new Location(123f, 123, "name")));
-        // System.out.println(dbManager.getByID(2));
-        // } catch (SQLException e) {
-        // e.printStackTrace();
-        // }
-        // Scanner scanner = new Scanner(System.in);
-        // IOManager<String, CommandResponse> io = createDefaultIOManager(scanner);
-        // File file = getSourceFile(args);
-        // int port = getServerPort(args);
-        // if (Objects.isNull(file) || port == -1) {
-        // scanner.close();
-        // return;
-        // }
-        // Gson gson = DefalutGsonCreator.createGson();
-        // // Collection<Person> collection = readCollectionFromFile(file, gson);
-        // // DataManager<Person> manager = new PersonCollectionManager(collection);
-        // DataManager<Person> manager = new
-        // PersonDBManager("jdbc:postgresql://localhost:5432/lab7", "postgres",
-        // "postgres");
-        // CommandManager<Class<? extends Command>> clientCommandManager = new
-        // CommandManager<>();
-        // ServerToClientCommandRunner clientCommandRunner;
-        // try {
-        // clientCommandRunner = new ServerToClientCommandRunner(clientCommandManager,
-        // new ArgumentParser<>(), new DatagramChannelIOManager(port));
-        // } catch (IOException e) {
-        // LOGGER.error("Starting server failed: {}", e.getMessage());
-        // scanner.close();
-        // return;
-        // }
-        // clientCommandManager.setCommands(createClientCommandsMap(manager,
-        // clientCommandRunner));
-        // CommandManager<String> serverCommandManager = new CommandManager<>(
-        // createServerCommandsMap(manager, gson, file));
-        // CommandRunner<String, String> serverCommandRunner = new
-        // DefaultCommandRunner(serverCommandManager,
-        // new ArgumentParser<>(), io);
-        // LOGGER.info("Starting server at port {}", port);
-        // PersonCollectionServer.start(serverCommandRunner, clientCommandRunner);
-        // LOGGER.info("Server stopped");
-        // scanner.close();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Collection<Person> readCollectionFromFile(File file, Gson gson) {
-        StringBuilder jsonBuilder = new StringBuilder();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            String line = bufferedReader.readLine();
-            while (line != null) {
-                jsonBuilder.append(line);
-                jsonBuilder.append("\n");
-                line = bufferedReader.readLine();
-            }
-            String result = jsonBuilder.toString().trim();
-            if (result.length() != 0) {
-                return gson.fromJson(result, HashSet.class);
-            }
-            LOGGER.error("Starting server with new empty collection");
-        } catch (IOException e) {
-            LOGGER.error("Starting server failed: Can't read from file");
+        Scanner scanner = new Scanner(System.in);
+        int port = getServerPort(args);
+        if (port == -1) {
+            scanner.close();
+            return;
         }
-        return new HashSet<>();
+
+        PersonDBManager manager = createDBManager("jdbc:postgresql://localhost:5432/lab7?characterEncoding=utf8",
+                "postgres", "postgres", "MD2");
+        DatagramChannelIOManager clientIOManager = createDatagramChannelIOManager(port);
+
+        if (Objects.isNull(manager) || Objects.isNull(clientIOManager)) {
+            scanner.close();
+            return;
+        }
+
+        ServerToClientCommandRunner serverToClientCommandRunner;
+        Map<Class<? extends DataCommand>, DataCommand> clientCommandManager = createClientCommandsMap(manager);
+
+        serverToClientCommandRunner = new ServerToClientCommandRunner(clientCommandManager, clientIOManager);
+
+        Map<String, Command> serverCommandsMap = createServerCommandsMap();
+        CommandRunner<String> serverCommandRunner = new ServerCommandRunner(new ArgumentParser<>(),
+                serverCommandsMap, createDefaultIOManager(scanner));
+        LOGGER.info("Starting server at port {}", port);
+        serverToClientCommandRunner.run();
+        // PersonCollectionServer personCollectionServer = new
+        // PersonCollectionServer(serverToClientCommandRunner);
+        // serverCommandRunner.run();
+        LOGGER.info("Server stopped");
+        scanner.close();
     }
 
-    public static Map<Class<? extends Command>, Command> createClientCommandsMap(
-            DataManager<Person> manager,
-            ServerToClientCommandRunner runner) {
-        HashMap<Class<? extends Command>, Command> commands = new HashMap<>();
-        commands.put(Help.class, new Help(commands.values()));
+    public static PersonDBManager createDBManager(String url, String user, String password, String messageDigest) {
+        try {
+            return new PersonDBManager(url, user,
+                    password, MessageDigest.getInstance(messageDigest));
+        } catch (SQLException e) {
+            LOGGER.error("Couldn't connect to DB: {}", e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error(e);
+        }
+        return null;
+    }
+
+    public static DatagramChannelIOManager createDatagramChannelIOManager(int port) {
+        try {
+            return new DatagramChannelIOManager(port);
+        } catch (IOException e) {
+            LOGGER.error("Starting server failed: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    public static Map<Class<? extends DataCommand>, DataCommand> createClientCommandsMap(
+            PersonDBManager manager) {
+        HashMap<Class<? extends DataCommand>, DataCommand> commands = new HashMap<>();
         commands.put(Info.class, new Info(manager));
         commands.put(Show.class, new Show(manager));
         commands.put(Add.class, new Add(manager));
@@ -159,37 +111,17 @@ public final class Server {
         commands.put(Clear.class, new Clear(manager));
         commands.put(AddIfMax.class, new AddIfMax(manager));
         commands.put(RemoveGreater.class, new RemoveGreater(manager));
-        commands.put(History.class, new History(runner));
         commands.put(MinByCoordinates.class, new MinByCoordinates(manager));
         commands.put(GroupCountingByPassportID.class, new GroupCountingByPassportID(manager));
         commands.put(FilterLessThanNationality.class, new FilterLessThanNationality(manager));
+        commands.put(RegisterUserConnection.class, new RegisterUserConnection(manager.getUserManager()));
         return commands;
     }
 
-    public static Map<String, Command> createServerCommandsMap(DataManager<Person> manager, Gson gson,
-            File file) {
+    public static Map<String, Command> createServerCommandsMap() {
         HashMap<String, Command> commands = new HashMap<>();
-        SaveToFile saveCommand = new SaveToFile(manager, gson, file);
-        commands.put("save", saveCommand);
-        commands.put("exit", new SaveAndExit(saveCommand));
+        commands.put("exit", new Exit());
         return commands;
-    }
-
-    public static File getSourceFile(String[] args) {
-        if (args.length == 0) {
-            LOGGER.error("Starting server falied: Path to collection file must be provided");
-            return null;
-        }
-        File file = new File(args[0]);
-        if (!file.exists() || !file.isFile()) {
-            LOGGER.error("Starting server failed: File not found");
-            return null;
-        }
-        if (!file.canRead()) {
-            LOGGER.error("Starting server failed: Can't read from file");
-            return null;
-        }
-        return file;
     }
 
     public static int getServerPort(String[] args) {

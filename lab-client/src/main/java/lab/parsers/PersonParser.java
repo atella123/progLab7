@@ -1,23 +1,26 @@
 package lab.parsers;
 
+import java.time.LocalDate;
+
 import lab.common.data.Color;
 import lab.common.data.Coordinates;
 import lab.common.data.Country;
 import lab.common.data.Location;
 import lab.common.data.Person;
 import lab.common.io.IOManager;
-import lab.common.util.DataReader;
 
 public final class PersonParser {
 
     private PersonParser() {
+        throw new UnsupportedOperationException();
     }
 
     public static Person parsePerson(IOManager<String, String> io) {
         Person.Builder builder = new Person.Builder();
         builder.setName(parseName(io));
         builder.setCoordinates(parseCoordinates(io));
-        builder.setHeigth(parseHeight(io));
+        builder.setCreationDate(LocalDate.now());
+        builder.setHeight(parseHeight(io));
         builder.setPassportID(parsePassportID(io));
         builder.setEyeColor(parseEyeColor(io));
         builder.setNationality(parseNationality(io));

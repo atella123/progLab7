@@ -2,11 +2,11 @@ package lab.parsers;
 
 import lab.common.data.Location;
 import lab.common.io.IOManager;
-import lab.common.util.DataReader;
 
 public final class LocationParser {
 
     private LocationParser() {
+        throw new UnsupportedOperationException();
     }
 
     public static Location parseLocation(IOManager<String, String> io) {

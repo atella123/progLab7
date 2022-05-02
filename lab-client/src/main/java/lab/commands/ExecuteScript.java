@@ -9,13 +9,12 @@ import java.util.Stack;
 import lab.common.commands.AbstractCommand;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
-import lab.common.util.CommandRunner;
 import lab.common.io.Reader;
-import lab.common.users.User;
+import lab.common.util.CommandRunner;
 
 public final class ExecuteScript extends AbstractCommand {
 
-    private final CommandRunner<String, ?> runner;
+    private final CommandRunner<String> runner;
     private final Stack<File> bannedFiles = new Stack<>();
     private final Stack<Reader<String>> oldIO = new Stack<>();
 
@@ -24,13 +23,13 @@ public final class ExecuteScript extends AbstractCommand {
         runner = null;
     }
 
-    public ExecuteScript(CommandRunner<String, ?> runner) {
+    public ExecuteScript(CommandRunner<String> runner) {
         super(true);
         this.runner = runner;
     }
 
     @Override
-    public CommandResponse execute(User user, Object... args) {
+    public CommandResponse execute(Object... args) {
         if (!isExecutableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
         }
@@ -41,11 +40,11 @@ public final class ExecuteScript extends AbstractCommand {
         if (!bannedFiles.contains(file)) {
             bannedFiles.push(file);
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-                oldIO.push(runner.getIO().getReader());
+                oldIO.push(runner.getIO()::readLine);
                 Reader<String> newReader = createReader(bufferedReader);
-                runner.setReader(newReader);
+                runner.getIO().setReader(newReader);
                 runner.run();
-                runner.setReader(oldIO.pop());
+                runner.getIO().setReader(oldIO.pop());
             } catch (IOException e) {
                 return new CommandResponse(CommandResult.ERROR, "Unable to read file");
             } finally {
