@@ -8,52 +8,50 @@ import lab.common.commands.CommandResult;
 import lab.common.commands.datacommands.DataCommand;
 import lab.common.io.IOManager;
 import lab.common.util.CommandRunner;
-import lab.common.util.DataCommandExecuteRequest;
+import lab.io.ServerExecuteRequest;
+import lab.io.ServerResponse;
 
-public class ServerToClientCommandRunner
-        implements CommandRunner<DataCommandExecuteRequest> {
+public class ServerToClientCommandRunner implements CommandRunner<ServerExecuteRequest> {
 
-    private IOManager<DataCommandExecuteRequest, CommandResponse> io;
+    private final IOManager<ServerExecuteRequest, ServerResponse> io;
     private final Map<Class<? extends DataCommand>, DataCommand> commandsMap;
 
     public ServerToClientCommandRunner(Map<Class<? extends DataCommand>, DataCommand> commandsMap,
-            IOManager<DataCommandExecuteRequest, CommandResponse> io) {
+            IOManager<ServerExecuteRequest, ServerResponse> io) {
         this.commandsMap = commandsMap;
         this.io = io;
     }
 
-    // TODO ?
     @Override
     public void run() {
-        CommandResponse resp;
+        ServerResponse resp;
         do {
             resp = runNextCommand();
-            getIO().write(resp);
+            io.write(resp);
         } while (!resp.getResult().equals(CommandResult.END));
     }
 
     @Override
-    public CommandResponse runNextCommand() {
-        DataCommandExecuteRequest nextRequest = io.readLine();
+    public ServerResponse runNextCommand() {
+        ServerExecuteRequest nextRequest = io.readLine();
         if (Objects.isNull(nextRequest)) {
-            return new CommandResponse(CommandResult.NO_INPUT);
+            return new ServerResponse(CommandResult.NO_INPUT, null);
         }
         DataCommand command = commandsMap.get(nextRequest.getCommandClass());
         if (Objects.isNull(command)) {
-            return new CommandResponse(CommandResult.ERROR, "Unknown command");
+            return new ServerResponse(CommandResult.ERROR, "Unknown command", nextRequest.getClientAddress());
         }
-        return command.execute(nextRequest.getUser(), nextRequest.getArgumnets());
+        return new ServerResponse(command.execute(nextRequest.getUser(), nextRequest.getArgumnets()),
+                nextRequest.getClientAddress());
     }
 
     @Override
-    public IOManager<DataCommandExecuteRequest, CommandResponse> getIO() {
-        return io;
+    public IOManager<ServerExecuteRequest, CommandResponse> getIO() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setIO(IOManager<DataCommandExecuteRequest, CommandResponse> newIO) {
-        this.io = newIO;
-
+    public void setIO(IOManager<ServerExecuteRequest, CommandResponse> io) {
+        throw new UnsupportedOperationException();
     }
-
 }

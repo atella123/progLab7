@@ -41,12 +41,10 @@ public abstract class AbstractStringCommandRunner implements CommandRunner<Strin
 
     public abstract String[] parseArgumentsFromString(String arg);
 
-    @Override
     public IOManager<String, CommandResponse> getIO() {
         return io;
     }
 
-    @Override
     public void setIO(IOManager<String, CommandResponse> newIO) {
         this.io = newIO;
     }

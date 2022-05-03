@@ -90,6 +90,14 @@ public class PersonDBManager implements OwnedDataManager<Person> {
         setCollectionFromDB();
     }
 
+    public PersonDBManager(String[] properties, MessageDigest hashFunction) throws SQLException {
+        this.connection = DriverManager.getConnection(properties[0], properties[1], properties[2]);
+        this.userManager = new UserDBManager(connection, hashFunction);
+        this.collectionManager = new PersonCollectionManager();
+        createTable();
+        setCollectionFromDB();
+    }
+
     private void createTable() throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.execute(INIT_TABLE_QUERY);
@@ -201,7 +209,6 @@ public class PersonDBManager implements OwnedDataManager<Person> {
                 PreparedStatement insertStatement = connection.prepareStatement(PREPARED_INSERT_QUERY)) {
 
             ResultSet result = statement.executeQuery("SELECT nextval('personID');");
-
             result.next();
 
             insertStatement.setInt(ID_INDEX, result.getInt(1));

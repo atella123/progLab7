@@ -5,7 +5,7 @@ import java.io.Serializable;
 import lab.common.commands.datacommands.DataCommand;
 import lab.common.commands.datacommands.User;
 
-public final class DataCommandExecuteRequest implements Serializable {
+public class DataCommandExecuteRequest implements Serializable {
 
     final User user;
     final Object[] arguments;

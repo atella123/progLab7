@@ -3,6 +3,7 @@ package lab.common.commands;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 
 import lab.common.data.Person;
 
@@ -27,7 +28,7 @@ public class CommandResponse implements Serializable {
         this.printableResult = false;
         this.message = null;
         this.comandResult = result;
-        if (collectionResult.length != 0) {
+        if (Objects.nonNull(collectionResult) && collectionResult.length != 0) {
             this.collectionToPrint = true;
             Arrays.sort(collectionResult, ALPHABETICAL_COMPARATOR);
             this.collectionResult = collectionResult;
@@ -49,7 +50,7 @@ public class CommandResponse implements Serializable {
         this.printableResult = true;
         this.message = message;
         this.comandResult = result;
-        if (collectionResult.length != 0) {
+        if (Objects.nonNull(collectionResult) && collectionResult.length != 0) {
             this.collectionToPrint = true;
             Arrays.sort(collectionResult, ALPHABETICAL_COMPARATOR);
             this.collectionResult = collectionResult;

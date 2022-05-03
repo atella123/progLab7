@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
@@ -33,6 +36,7 @@ import lab.common.util.ArgumentParser;
 import lab.common.util.CommandRunner;
 import lab.data.PersonDBManager;
 import lab.io.DatagramChannelIOManager;
+import lab.util.PersonCollectionServer;
 import lab.util.ServerCommandRunner;
 import lab.util.ServerToClientCommandRunner;
 
@@ -46,42 +50,44 @@ public final class Server {
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
-        int port = getServerPort(args);
-        if (port == -1) {
-            scanner.close();
+        Map<String, List<String>> argsMap = getArgsAsMap(args);
+
+        int port = getServerPort(argsMap);
+        String[] dbProperties = getDataBaseProperties(argsMap);
+
+        if (port == -1 || dbProperties.length == 0) {
             return;
         }
 
-        PersonDBManager manager = createDBManager("jdbc:postgresql://localhost:5432/lab7",
-                "postgres", "postgres", "MD2");
+        PersonDBManager manager = createDBManager(dbProperties, "MD2");
         DatagramChannelIOManager clientIOManager = createDatagramChannelIOManager(port);
 
         if (Objects.isNull(manager) || Objects.isNull(clientIOManager)) {
-            scanner.close();
             return;
         }
 
-        ServerToClientCommandRunner serverToClientCommandRunner;
-        Map<Class<? extends DataCommand>, DataCommand> clientCommandManager = createClientCommandsMap(manager);
-
-        serverToClientCommandRunner = new ServerToClientCommandRunner(clientCommandManager, clientIOManager);
-
+        Scanner scanner = new Scanner(System.in);
         Map<String, Command> serverCommandsMap = createServerCommandsMap();
         CommandRunner<String> serverCommandRunner = new ServerCommandRunner(new ArgumentParser<>(),
                 serverCommandsMap, createDefaultIOManager(scanner));
+
+        Map<Class<? extends DataCommand>, DataCommand> clientCommandManager = createClientCommandsMap(manager);
+        ServerToClientCommandRunner serverToClientCommandRunner = new ServerToClientCommandRunner(clientCommandManager,
+                clientIOManager);
+
         LOGGER.info("Starting server at port {}", port);
-        serverToClientCommandRunner.run();
-        // PersonCollectionServer personCollectionServer = new
-        // PersonCollectionServer(serverToClientCommandRunner);
-        // serverCommandRunner.run();
+
+        PersonCollectionServer personCollectionServer = new PersonCollectionServer(serverCommandRunner,
+                serverToClientCommandRunner);
+        personCollectionServer.run();
+
         LOGGER.info("Server stopped");
         scanner.close();
     }
 
-    public static PersonDBManager createDBManager(String url, String user, String password, String messageDigest) {
+    public static PersonDBManager createDBManager(String[] properties, String messageDigest) {
         try {
-            return new PersonDBManager(url, user, password, MessageDigest.getInstance(messageDigest));
+            return new PersonDBManager(properties, MessageDigest.getInstance(messageDigest));
         } catch (SQLException e) {
             LOGGER.error("Couldn't connect to DB: {}", e.getMessage());
         } catch (NoSuchAlgorithmException e) {
@@ -123,23 +129,68 @@ public final class Server {
         return commands;
     }
 
-    public static int getServerPort(String[] args) {
-        final int defaultPort = 1234;
-        final int maxPort = 65535;
-        final int minPort = 1;
-        if (args.length < 2) {
-            LOGGER.info("Port value set as default (1234)");
-            return defaultPort;
-        }
-        if (args[1].matches("\\d{1,5}")) {
-            int port = Integer.parseInt(args[1]);
-            if (port <= maxPort && port >= minPort) {
-                return port;
+    public static Map<String, List<String>> getArgsAsMap(String[] args) {
+
+        Map<String, List<String>> argsMap = new HashMap<>();
+
+        String argName = "";
+        List<String> arguments = new ArrayList<>();
+
+        argsMap.put(argName, arguments);
+
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].matches("-.")) {
+                argName = args[i];
+                arguments = new ArrayList<>();
+                argsMap.put(argName, arguments);
+            } else {
+                arguments.add(args[i]);
             }
         }
+
+        return argsMap;
+    }
+
+    private static int getServerPort(Map<String, List<String>> args) {
+        final int defaulPort = 1234;
+        final int maxPort = 65535;
+        final int minPort = 1;
+        List<String> unordered = args.get("");
+        List<String> ordered = args.get("-p");
+        if (unordered.isEmpty() && Objects.isNull(ordered)) {
+            LOGGER.info("Port value set as default (1234)");
+            return defaulPort;
+        }
+        int port = -1;
+        if (!ordered.isEmpty() && ordered.get(0).matches("\\d+")) {
+            port = Integer.parseInt(ordered.get(0));
+        } else if (!unordered.isEmpty() && unordered.get(0).matches("\\d+")) {
+            port = Integer.parseInt(unordered.get(0));
+            unordered = unordered.subList(1, unordered.size() - 2);
+        }
+        if (port <= maxPort && port >= minPort) {
+            return port;
+        }
         LOGGER.error(
-                "Second argument must either be valid port value or not present (if so it will be set to default value)");
-        return -1;
+                "First positional (or -p) argument must either be valid port value or not present (if so it will be set to default value)");
+        return port;
+    }
+
+    private static String[] getDataBaseProperties(Map<String, List<String>> args) {
+        final String protocol = "jdbc:postgresql://";
+        List<String> unordered = args.get("");
+        List<String> ordered = args.get("-d");
+        if (unordered.size() < 3 || Objects.isNull(ordered) || ordered.size() < 3) {
+            LOGGER.error(
+                    "Unable to get DB properties: db properties (hostname, user, password) must be passed as positional arguments");
+            return new String[0];
+        }
+        if (ordered.size() >= 3) {
+            ordered.set(0, protocol + ordered.get(0));
+            return Arrays.copyOf(ordered.toArray(new String[0]), 3);
+        }
+        unordered.set(0, protocol + unordered.get(0));
+        return Arrays.copyOf(unordered.toArray(new String[0]), 3);
     }
 
     public static IOManager<String, CommandResponse> createDefaultIOManager(Scanner scanner) {

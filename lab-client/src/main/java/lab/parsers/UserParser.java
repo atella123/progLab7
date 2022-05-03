@@ -36,7 +36,7 @@ public final class UserParser {
             writter.write("Please enter L(ogin) to continue singing in or R(egister) to continue registration");
             String loginOrRegister = DataReader.readValidString(new IOManager<>(clientIO::readLine, writter),
                     (x -> x.matches("([Ll](ogin)?)|([Rr](egister)?)")),
-                    "Please enter [Ll](ogin) to continue singing in or R(egister) to continue registration");
+                    "Please enter L(ogin) to continue singing in or R(egister) to continue registration");
 
             writter.write("Enter username:");
             String username = DataReader.readValidString(stringIO, x -> x.length() <= MAX_USERNAME_LEN,
