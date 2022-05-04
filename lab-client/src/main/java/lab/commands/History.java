@@ -10,13 +10,13 @@ import lab.common.util.CommandRunnerWithHistory;
 
 public final class History extends AbstractCommand {
 
-    private CommandRunnerWithHistory<?> commandRunner;
+    private CommandRunnerWithHistory commandRunner;
 
     public History() {
         super();
     }
 
-    public History(CommandRunnerWithHistory<?> commandRunner) {
+    public History(CommandRunnerWithHistory commandRunner) {
         super(true);
         this.commandRunner = commandRunner;
     }

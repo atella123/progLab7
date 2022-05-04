@@ -21,7 +21,7 @@ import lab.common.util.DataCommandExecuteRequest;
 import lab.io.DatagramSocketIOManager;
 import lab.parsers.UserParser;
 
-public class ClientCommandRunner extends AbstractStringCommandRunner implements CommandRunnerWithHistory<String> {
+public class ClientCommandRunner extends AbstractStringCommandRunner implements CommandRunnerWithHistory {
 
     private static final int HISTORY_SIZE = 11;
 

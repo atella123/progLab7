@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
@@ -50,10 +48,8 @@ public final class Server {
 
     public static void main(String[] args) {
 
-        Map<String, List<String>> argsMap = getArgsAsMap(args);
-
-        int port = getServerPort(argsMap);
-        String[] dbProperties = getDataBaseProperties(argsMap);
+        int port = getServerPort(args);
+        String[] dbProperties = getDataBaseProperties(args);
 
         if (port == -1 || dbProperties.length == 0) {
             return;
@@ -68,7 +64,7 @@ public final class Server {
 
         Scanner scanner = new Scanner(System.in);
         Map<String, Command> serverCommandsMap = createServerCommandsMap();
-        CommandRunner<String> serverCommandRunner = new ServerCommandRunner(new ArgumentParser<>(),
+        CommandRunner serverCommandRunner = new ServerCommandRunner(new ArgumentParser<>(),
                 serverCommandsMap, createDefaultIOManager(scanner));
 
         Map<Class<? extends DataCommand>, DataCommand> clientCommandManager = createClientCommandsMap(manager);
@@ -129,68 +125,30 @@ public final class Server {
         return commands;
     }
 
-    public static Map<String, List<String>> getArgsAsMap(String[] args) {
-
-        Map<String, List<String>> argsMap = new HashMap<>();
-
-        String argName = "";
-        List<String> arguments = new ArrayList<>();
-
-        argsMap.put(argName, arguments);
-
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].matches("-.")) {
-                argName = args[i];
-                arguments = new ArrayList<>();
-                argsMap.put(argName, arguments);
-            } else {
-                arguments.add(args[i]);
-            }
-        }
-
-        return argsMap;
-    }
-
-    private static int getServerPort(Map<String, List<String>> args) {
-        final int defaulPort = 1234;
+    public static int getServerPort(String[] args) {
         final int maxPort = 65535;
         final int minPort = 1;
-        List<String> unordered = args.get("");
-        List<String> ordered = args.get("-p");
-        if (unordered.isEmpty() && Objects.isNull(ordered)) {
-            LOGGER.info("Port value set as default (1234)");
-            return defaulPort;
-        }
-        int port = -1;
-        if (!ordered.isEmpty() && ordered.get(0).matches("\\d+")) {
-            port = Integer.parseInt(ordered.get(0));
-        } else if (!unordered.isEmpty() && unordered.get(0).matches("\\d+")) {
-            port = Integer.parseInt(unordered.get(0));
-            unordered = unordered.subList(1, unordered.size() - 2);
-        }
-        if (port <= maxPort && port >= minPort) {
-            return port;
+        if (args.length > 0 && args[0].matches("\\d{1,5}")) {
+            int port = Integer.parseInt(args[0]);
+            if (port <= maxPort && port >= minPort) {
+                return port;
+            }
         }
         LOGGER.error(
-                "First positional (or -p) argument must either be valid port value or not present (if so it will be set to default value)");
-        return port;
+                "First argument must either be valid port value");
+        return -1;
     }
 
-    private static String[] getDataBaseProperties(Map<String, List<String>> args) {
+    private static String[] getDataBaseProperties(String[] args) {
         final String protocol = "jdbc:postgresql://";
-        List<String> unordered = args.get("");
-        List<String> ordered = args.get("-d");
-        if (unordered.size() < 3 || Objects.isNull(ordered) || ordered.size() < 3) {
-            LOGGER.error(
-                    "Unable to get DB properties: db properties (hostname, user, password) must be passed as positional arguments");
+        final int propertiesCount = 3;
+        if (args.length < propertiesCount + 1) {
+            LOGGER.error("Arguments from position 2 to 4 must match db url, username and password");
             return new String[0];
         }
-        if (ordered.size() >= 3) {
-            ordered.set(0, protocol + ordered.get(0));
-            return Arrays.copyOf(ordered.toArray(new String[0]), 3);
-        }
-        unordered.set(0, protocol + unordered.get(0));
-        return Arrays.copyOf(unordered.toArray(new String[0]), 3);
+        String[] properties = Arrays.copyOfRange(args, 1, 1 + propertiesCount);
+        properties[0] = protocol + properties[0];
+        return properties;
     }
 
     public static IOManager<String, CommandResponse> createDefaultIOManager(Scanner scanner) {

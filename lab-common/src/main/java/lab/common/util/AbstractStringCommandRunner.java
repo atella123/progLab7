@@ -7,7 +7,7 @@ import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.io.IOManager;
 
-public abstract class AbstractStringCommandRunner implements CommandRunner<String> {
+public abstract class AbstractStringCommandRunner implements ChangeableIORunner<String, CommandResponse> {
 
     private final ArgumentParser<String> argumentParser;
     private final Map<String, Command> commandsMap;
@@ -45,6 +45,7 @@ public abstract class AbstractStringCommandRunner implements CommandRunner<Strin
         return io;
     }
 
+    @Override
     public void setIO(IOManager<String, CommandResponse> newIO) {
         this.io = newIO;
     }

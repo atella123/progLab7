@@ -3,15 +3,14 @@ package lab.util;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.util.CommandRunner;
-import lab.io.ServerExecuteRequest;
 
 public final class PersonCollectionServer {
 
-    private final CommandRunner<String> serverCommandRunner;
-    private final CommandRunner<ServerExecuteRequest> serverToClientCommandRunner;
+    private final CommandRunner serverCommandRunner;
+    private final CommandRunner serverToClientCommandRunner;
 
-    public PersonCollectionServer(CommandRunner<String> serverCommandRunner,
-            CommandRunner<ServerExecuteRequest> serverToClientCommandRunner) {
+    public PersonCollectionServer(CommandRunner serverCommandRunner,
+            CommandRunner serverToClientCommandRunner) {
         this.serverCommandRunner = serverCommandRunner;
         this.serverToClientCommandRunner = serverToClientCommandRunner;
     }

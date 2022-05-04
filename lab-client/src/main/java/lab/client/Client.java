@@ -36,7 +36,6 @@ import lab.common.io.IOManager;
 import lab.common.io.Reader;
 import lab.common.io.Writter;
 import lab.common.util.ArgumentParser;
-import lab.common.util.CommandRunnerWithHistory;
 import lab.parsers.CoordinatesParser;
 import lab.parsers.DataReader;
 import lab.parsers.LocationParser;
@@ -166,7 +165,7 @@ public final class Client {
         return serverAdress;
     }
 
-    public static Map<String, Command> createCommands(CommandRunnerWithHistory<String> commandRunner,
+    public static Map<String, Command> createCommands(ClientCommandRunner commandRunner,
             Map<String, DataCommand> serverCommands) {
         HashMap<String, Command> commands = new HashMap<>();
         Help help = new Help();
