@@ -1,6 +1,5 @@
 package lab.util;
 
-import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -67,16 +66,13 @@ public final class PersonCollectionServer {
     }
 
     private void readNext() {
-        ServerExecuteRequest nextCommand;
-        nextCommand = io.read();
-        if (Objects.nonNull(nextCommand)) {
-            try {
-                requestQueue.put(nextCommand);
-                runnerPool.execute(this::runNext);
-            } catch (InterruptedException e) {
-                LOGGER.error("Thread interrupted while reading");
-                Thread.currentThread().interrupt();
-            }
+        ServerExecuteRequest nextCommand = io.read();
+        try {
+            requestQueue.put(nextCommand);
+            runnerPool.execute(this::runNext);
+        } catch (InterruptedException e) {
+            LOGGER.error("Thread interrupted while reading");
+            Thread.currentThread().interrupt();
         }
     }
 

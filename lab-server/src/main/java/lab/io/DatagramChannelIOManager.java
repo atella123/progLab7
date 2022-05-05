@@ -28,7 +28,15 @@ public class DatagramChannelIOManager extends IOManager<ServerExecuteRequest, Se
     public DatagramChannelIOManager(int port) throws IOException {
         datagramChannel = DatagramChannel.open();
         datagramChannel.bind(new InetSocketAddress(port));
-        datagramChannel.configureBlocking(false);
+        datagramChannel.configureBlocking(true);
+        setReader(this::readCommandWithArgs);
+        setWritter(this::writeResponse);
+    }
+
+    public DatagramChannelIOManager(int port, boolean blocking) throws IOException {
+        datagramChannel = DatagramChannel.open();
+        datagramChannel.bind(new InetSocketAddress(port));
+        datagramChannel.configureBlocking(blocking);
         setReader(this::readCommandWithArgs);
         setWritter(this::writeResponse);
     }
