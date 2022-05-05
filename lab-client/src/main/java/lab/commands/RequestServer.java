@@ -46,7 +46,7 @@ public final class RequestServer extends AbstractCommand {
         DataCommandExecuteRequest commandWithArguments = new DataCommandExecuteRequest(user, command.getClass(),
                 parsedArgs);
         io.write(commandWithArguments);
-        return io.readLine();
+        return io.read();
     }
 
     @Override

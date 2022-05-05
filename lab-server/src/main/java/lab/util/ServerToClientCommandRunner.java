@@ -10,7 +10,7 @@ import lab.common.util.CommandRunner;
 import lab.io.ServerExecuteRequest;
 import lab.io.ServerResponse;
 
-public class ServerToClientCommandRunner implements CommandRunner {
+public class ServerToClientCommandRunner implements CommandRunner<ServerExecuteRequest, ServerResponse> {
 
     private final IOManager<ServerExecuteRequest, ServerResponse> io;
     private final Map<Class<? extends DataCommand>, DataCommand> commandsMap;
@@ -31,16 +31,26 @@ public class ServerToClientCommandRunner implements CommandRunner {
     }
 
     @Override
+    public ServerResponse run(ServerExecuteRequest request) {
+        DataCommand command = commandsMap.get(request.getCommandClass());
+        if (Objects.isNull(command)) {
+            return new ServerResponse(CommandResult.ERROR, "Unknown command", request.getClientAddress());
+        }
+        return new ServerResponse(command.execute(request.getUser(), request.getArgumnets()),
+                request.getClientAddress());
+    }
+
+    @Override
     public ServerResponse runNextCommand() {
-        ServerExecuteRequest nextRequest = io.readLine();
+        ServerExecuteRequest nextRequest = io.read();
         if (Objects.isNull(nextRequest)) {
             return new ServerResponse(CommandResult.NO_INPUT, null);
         }
-        DataCommand command = commandsMap.get(nextRequest.getCommandClass());
-        if (Objects.isNull(command)) {
-            return new ServerResponse(CommandResult.ERROR, "Unknown command", nextRequest.getClientAddress());
-        }
-        return new ServerResponse(command.execute(nextRequest.getUser(), nextRequest.getArgumnets()),
-                nextRequest.getClientAddress());
+        return run(nextRequest);
+    }
+
+    @Override
+    public IOManager<ServerExecuteRequest, ServerResponse> getIO() {
+        return io;
     }
 }

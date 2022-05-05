@@ -39,8 +39,8 @@ public class IOManager<R, W> {
         writter.write(message);
     }
 
-    public R readLine() {
-        return reader.readLine();
+    public R read() {
+        return reader.read();
     }
 
     @Override

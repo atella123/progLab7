@@ -25,7 +25,7 @@ public final class UserParser {
 
         CommandResponse response = null;
         User user;
-        IOManager<String, String> stringIO = new IOManager<>(clientIO::readLine, writter);
+        IOManager<String, String> stringIO = new IOManager<>(clientIO::read, writter);
 
         do {
 
@@ -34,7 +34,7 @@ public final class UserParser {
             }
 
             writter.write("Please enter L(ogin) to continue singing in or R(egister) to continue registration");
-            String loginOrRegister = DataReader.readValidString(new IOManager<>(clientIO::readLine, writter),
+            String loginOrRegister = DataReader.readValidString(new IOManager<>(clientIO::read, writter),
                     (x -> x.matches("([Ll](ogin)?)|([Rr](egister)?)")),
                     "Please enter L(ogin) to continue singing in or R(egister) to continue registration");
 
@@ -50,7 +50,7 @@ public final class UserParser {
                     RegisterCommandFlags.getFlag(loginOrRegister));
 
             toServerIO.write(request);
-            response = toServerIO.readLine();
+            response = toServerIO.read();
 
         } while (response.getResult() != CommandResult.SUCCESS);
         writter.write("Logged in successfully");

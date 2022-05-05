@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +28,7 @@ import lab.common.data.Country;
 import lab.common.data.Location;
 import lab.common.data.Person;
 
-public class PersonDBManager implements OwnedDataManager<Person> {
+public final class PersonDBManager implements OwnedDataManager<Person> {
 
     private static final Logger LOGGER = LogManager.getLogger(lab.data.PersonDBManager.class);
 
@@ -73,6 +75,7 @@ public class PersonDBManager implements OwnedDataManager<Person> {
     private final UserDBManager userManager;
     private final PersonCollectionManager collectionManager;
     private final LocalDate timestamp = LocalDate.now();
+    private final Lock lock = new ReentrantLock();
 
     public PersonDBManager(Connection connection, MessageDigest hashFunction) throws SQLException {
         this.connection = connection;
@@ -195,7 +198,12 @@ public class PersonDBManager implements OwnedDataManager<Person> {
 
     @Override
     public boolean allMatches(Predicate<Person> predicate) {
-        return collectionManager.allMatches(predicate);
+        try {
+            lock.lock();
+            return collectionManager.allMatches(predicate);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -227,7 +235,9 @@ public class PersonDBManager implements OwnedDataManager<Person> {
 
             insertStatement.execute();
 
+            lock.lock();
             collectionManager.add(new Person.Builder(person).setId(result.getInt(1)).build());
+            lock.unlock();
         } catch (SQLException e) {
             LOGGER.error("An error occurred while trying to write to database: {}", e.getMessage());
             return new DataManagerResponse(false, "An error occurred while trying to add person");
@@ -263,6 +273,7 @@ public class PersonDBManager implements OwnedDataManager<Person> {
         if (!canUpdateResponse.isSuccess()) {
             return canUpdateResponse;
         }
+        lock.lock();
         try (PreparedStatement statement = connection.prepareStatement(
                 "DELETE FROM persons WHERE id = ? RETURNING id")) {
             statement.setInt(1, id);
@@ -275,6 +286,8 @@ public class PersonDBManager implements OwnedDataManager<Person> {
         } catch (SQLException e) {
             LOGGER.error("Failed to delete person: {}", e.getMessage());
             return new DataManagerResponse(false, "An error occured when trying to delete person");
+        } finally {
+            lock.unlock();
         }
         return new DataManagerResponse();
 
@@ -282,7 +295,12 @@ public class PersonDBManager implements OwnedDataManager<Person> {
 
     @Override
     public DataManagerResponse removeMatches(User user, Predicate<Person> predicate) {
-        return removeAll(user, getMatches(predicate));
+        lock.lock();
+        try {
+            return removeAll(user, getMatches(predicate));
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -325,12 +343,16 @@ public class PersonDBManager implements OwnedDataManager<Person> {
             statement.setInt(ID_INDEX, id);
 
             statement.execute();
+
+            lock.lock();
+            collectionManager.updateID(id, person);
+            lock.unlock();
+
+            return new DataManagerResponse();
         } catch (SQLException e) {
             LOGGER.error("Failed to update person: {}", e.getMessage());
             return new DataManagerResponse(false, "An error occured when trying to update person");
         }
-        collectionManager.updateID(id, person);
-        return new DataManagerResponse();
     }
 
     @Override

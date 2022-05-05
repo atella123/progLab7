@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import lab.common.data.Person;
 
-public class PersonCollectionManager {
+public final class PersonCollectionManager {
 
     private Collection<Person> collection;
 

@@ -2,11 +2,9 @@ package lab.util;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 
 import lab.common.commands.Command;
 import lab.common.commands.CommandResponse;
-import lab.common.commands.CommandResult;
 import lab.common.io.IOManager;
 import lab.common.util.AbstractStringCommandRunner;
 import lab.common.util.ArgumentParser;
@@ -19,13 +17,9 @@ public class ServerCommandRunner extends AbstractStringCommandRunner {
     }
 
     @Override
-    public CommandResponse runNextCommand() {
-        String nextLine = getIO().readLine();
-        if (Objects.isNull(nextLine)) {
-            return new CommandResponse(CommandResult.NO_INPUT);
-        }
-        Command command = parseCommand(nextLine);
-        Object[] args = getArgumentParser().parseArguments(command, parseArgumentsFromString(nextLine));
+    public CommandResponse run(String request) {
+        Command command = parseCommand(request);
+        Object[] args = getArgumentParser().parseArguments(command, parseArgumentsFromString(request));
         return command.execute(args);
     }
 

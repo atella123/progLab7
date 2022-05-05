@@ -73,7 +73,7 @@ public final class Client {
             throws SocketException {
         Map<String, Command> clientCommandsMap = new HashMap<>();
         ArgumentParser<String> argumentParser = new ArgumentParser<>();
-        IOManager<String, CommandResponse> commandRunnerIO = new IOManager<>(io::readLine,
+        IOManager<String, CommandResponse> commandRunnerIO = new IOManager<>(io::read,
                 response -> {
                     if (response.hasPrintableResult()) {
                         System.out.println(response.getMessage());
@@ -87,7 +87,7 @@ public final class Client {
         Map<String, DataCommand> serverCommandsMap = createServerCommandsMap();
         ClientCommandRunner runner = new ClientCommandRunner(clientCommandsMap, serverCommandsMap,
                 argumentParser, serverAdress, commandRunnerIO);
-        updateArgumentParser(argumentParser, serverCommandsMap, io::readLine);
+        updateArgumentParser(argumentParser, serverCommandsMap, io::read);
         clientCommandsMap.putAll(createCommands(runner, serverCommandsMap));
         return runner;
     }

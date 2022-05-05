@@ -6,12 +6,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 
 import lab.commands.RequestServer;
 import lab.common.commands.Command;
 import lab.common.commands.CommandResponse;
-import lab.common.commands.CommandResult;
 import lab.common.commands.datacommands.DataCommand;
 import lab.common.io.IOManager;
 import lab.common.util.AbstractStringCommandRunner;
@@ -21,7 +19,8 @@ import lab.common.util.DataCommandExecuteRequest;
 import lab.io.DatagramSocketIOManager;
 import lab.parsers.UserParser;
 
-public class ClientCommandRunner extends AbstractStringCommandRunner implements CommandRunnerWithHistory {
+public class ClientCommandRunner extends AbstractStringCommandRunner
+        implements CommandRunnerWithHistory<String, CommandResponse> {
 
     private static final int HISTORY_SIZE = 11;
 
@@ -40,13 +39,9 @@ public class ClientCommandRunner extends AbstractStringCommandRunner implements 
     }
 
     @Override
-    public CommandResponse runNextCommand() {
-        String nextLine = getIO().readLine();
-        if (Objects.isNull(nextLine)) {
-            return new CommandResponse(CommandResult.NO_INPUT);
-        }
-        Command command = parseCommand(nextLine);
-        Object[] args = getArgumentParser().parseArguments(command, parseArgumentsFromString(nextLine));
+    public CommandResponse run(String request) {
+        Command command = parseCommand(request);
+        Object[] args = getArgumentParser().parseArguments(command, parseArgumentsFromString(request));
         if (command != requestCommand) {
             updateHistory(command.toString());
         }

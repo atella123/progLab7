@@ -11,11 +11,11 @@ import lab.common.commands.ValidityChecker;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.io.Reader;
-import lab.common.util.ChangeableIORunner;
+import lab.common.util.IOSettableCommandRunner;
 
 public final class ExecuteScript extends AbstractCommand {
 
-    private final ChangeableIORunner<String, ?> runner;
+    private final IOSettableCommandRunner<String, ?> runner;
     private final Stack<File> bannedFiles = new Stack<>();
     private final Stack<Reader<String>> oldIO = new Stack<>();
 
@@ -24,7 +24,7 @@ public final class ExecuteScript extends AbstractCommand {
         runner = null;
     }
 
-    public ExecuteScript(ChangeableIORunner<String, ?> runner) {
+    public ExecuteScript(IOSettableCommandRunner<String, ?> runner) {
         super(true);
         this.runner = runner;
     }

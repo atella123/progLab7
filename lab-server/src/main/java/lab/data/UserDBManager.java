@@ -2,6 +2,8 @@ package lab.data;
 
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +26,7 @@ public final class UserDBManager implements UserManager {
             + "name VARCHAR(30) PRIMARY KEY,"
             + "password bytea NOT NULL);";
 
+    private final Lock lock = new ReentrantLock();
     private final Connection connection;
     private final MessageDigest hashFunction;
 
@@ -52,10 +55,12 @@ public final class UserDBManager implements UserManager {
         try (PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO users(name, password) VALUES (?, ?);")) {
 
+            lock.lock();
             hashFunction.update(user.getPassword().getBytes());
             int i = 1;
             statement.setString(i++, user.getUsername());
             statement.setBytes(i, hashFunction.digest());
+            lock.unlock();
 
             statement.execute();
 
@@ -116,10 +121,12 @@ public final class UserDBManager implements UserManager {
         try (PreparedStatement statement = connection.prepareStatement(
                 "SELECT EXISTS(SELECT 1 FROM users WHERE name = ? AND password = ?);")) {
 
+            lock.lock();
             hashFunction.update(user.getPassword().getBytes());
 
             statement.setString(1, user.getUsername());
             statement.setBytes(2, hashFunction.digest());
+            lock.unlock();
 
             statement.execute();
 
@@ -149,9 +156,13 @@ public final class UserDBManager implements UserManager {
                 return false;
             }
 
-            hashFunction.update(user.getPassword().getBytes());
-
-            return Arrays.equals(hashFunction.digest(), result.getBytes(1));
+            try {
+                lock.lock();
+                hashFunction.update(user.getPassword().getBytes());
+                return Arrays.equals(hashFunction.digest(), result.getBytes(1));
+            } finally {
+                lock.unlock();
+            }
 
         } catch (SQLException e) {
             LOGGER.error("Reading user failed: {}", e.getMessage());

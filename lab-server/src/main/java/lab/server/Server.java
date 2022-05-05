@@ -64,11 +64,12 @@ public final class Server {
 
         Scanner scanner = new Scanner(System.in);
         Map<String, Command> serverCommandsMap = createServerCommandsMap();
-        CommandRunner serverCommandRunner = new ServerCommandRunner(new ArgumentParser<>(),
-                serverCommandsMap, createDefaultIOManager(scanner));
+        CommandRunner<String, CommandResponse> serverCommandRunner = new ServerCommandRunner(new ArgumentParser<>(),
+                serverCommandsMap, createServerIOManager(scanner));
 
         Map<Class<? extends DataCommand>, DataCommand> clientCommandManager = createClientCommandsMap(manager);
-        ServerToClientCommandRunner serverToClientCommandRunner = new ServerToClientCommandRunner(clientCommandManager,
+        ServerToClientCommandRunner serverToClientCommandRunner = new ServerToClientCommandRunner(
+                clientCommandManager,
                 clientIOManager);
 
         LOGGER.info("Starting server at port {}", port);
@@ -77,7 +78,7 @@ public final class Server {
                 serverToClientCommandRunner);
         personCollectionServer.run();
 
-        LOGGER.info("Server stopped");
+        LOGGER.info("Stopping server");
         scanner.close();
     }
 
@@ -151,7 +152,7 @@ public final class Server {
         return properties;
     }
 
-    public static IOManager<String, CommandResponse> createDefaultIOManager(Scanner scanner) {
+    public static IOManager<String, CommandResponse> createServerIOManager(Scanner scanner) {
         return new IOManager<>(
                 () -> {
                     if (scanner.hasNextLine()) {

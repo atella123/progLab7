@@ -15,7 +15,7 @@ public final class DataReader {
     }
 
     public static String readString(IOManager<String, String> io) {
-        return io.readLine();
+        return io.read();
     }
 
     public static String readValidString(IOManager<String, String> io, Predicate<String> predicate,

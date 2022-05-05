@@ -1,13 +1,14 @@
 package lab.common.util;
 
 import java.util.Map;
+import java.util.Objects;
 
 import lab.common.commands.Command;
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.io.IOManager;
 
-public abstract class AbstractStringCommandRunner implements ChangeableIORunner<String, CommandResponse> {
+public abstract class AbstractStringCommandRunner implements IOSettableCommandRunner<String, CommandResponse> {
 
     private final ArgumentParser<String> argumentParser;
     private final Map<String, Command> commandsMap;
@@ -27,6 +28,15 @@ public abstract class AbstractStringCommandRunner implements ChangeableIORunner<
             resp = runNextCommand();
             getIO().write(resp);
         } while (!resp.getResult().equals(CommandResult.END) && !resp.getResult().equals(CommandResult.NO_INPUT));
+    }
+
+    @Override
+    public CommandResponse runNextCommand() {
+        String nextLine = getIO().read();
+        if (Objects.isNull(nextLine)) {
+            return new CommandResponse(CommandResult.NO_INPUT);
+        }
+        return run(nextLine);
     }
 
     protected final Map<String, Command> getCommandsMap() {

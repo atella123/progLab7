@@ -39,7 +39,7 @@ public class CommandResponse implements Serializable {
     }
 
     public CommandResponse(CommandResult result, String message) {
-        this.printableResult = true;
+        this.printableResult = message.isEmpty();
         this.message = message;
         this.comandResult = result;
         this.collectionToPrint = false;
@@ -47,7 +47,7 @@ public class CommandResponse implements Serializable {
     }
 
     public CommandResponse(CommandResult result, String message, Person[] collectionResult) {
-        this.printableResult = true;
+        this.printableResult = message.isEmpty();
         this.message = message;
         this.comandResult = result;
         if (Objects.nonNull(collectionResult) && collectionResult.length != 0) {
