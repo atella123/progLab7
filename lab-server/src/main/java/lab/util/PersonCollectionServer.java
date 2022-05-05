@@ -6,7 +6,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
@@ -19,7 +18,6 @@ public final class PersonCollectionServer {
 
     private static final int READER_POOL_SIZE = 2;
     private static final int RUNNER_POOL_SIZE = 4;
-    private static final int WRITTER_POOL_SIZE = 4;
 
     private final CommandRunner<String, CommandResponse> serverCommandRunner;
     private final CommandRunner<ServerExecuteRequest, ServerResponse> serverToClientCommandRunner;
@@ -73,8 +71,8 @@ public final class PersonCollectionServer {
                 requestQueue.put(nextCommand);
                 runnerPool.execute(this::runNext);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -85,8 +83,8 @@ public final class PersonCollectionServer {
                     serverToClientCommandRunner.run(requestQueue.take()));
             writterPool.submit(this::writeNext);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -94,8 +92,8 @@ public final class PersonCollectionServer {
         try {
             io.write(responseQueue.take());
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 }
