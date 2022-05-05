@@ -61,14 +61,13 @@ public final class PersonCollectionServer {
 
     private void startReaders() {
         while (!stopped && readerPool.getQueuedTaskCount() < READER_POOL_SIZE) {
-            readNext();
+            readerPool.submit(this::readNext);
         }
     }
 
     private void readNext() {
-        ServerExecuteRequest nextCommand = io.read();
         try {
-            requestQueue.put(nextCommand);
+            requestQueue.put(io.read());
             runnerPool.execute(this::runNext);
         } catch (InterruptedException e) {
             LOGGER.error("Thread interrupted while reading");
