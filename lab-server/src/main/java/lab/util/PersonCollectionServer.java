@@ -7,6 +7,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import lab.common.commands.CommandResponse;
 import lab.common.commands.CommandResult;
 import lab.common.io.IOManager;
@@ -18,6 +21,8 @@ public final class PersonCollectionServer {
 
     private static final int READER_POOL_SIZE = 2;
     private static final int RUNNER_POOL_SIZE = 4;
+
+    private static final Logger LOGGER = LogManager.getLogger(lab.util.PersonCollectionServer.class);
 
     private final CommandRunner<String, CommandResponse> serverCommandRunner;
     private final CommandRunner<ServerExecuteRequest, ServerResponse> serverToClientCommandRunner;
@@ -45,8 +50,6 @@ public final class PersonCollectionServer {
         stopped = false;
 
         readerPool.submit(this::startReaders);
-        // startRunners();
-        // writterPool.submit(this::startWritters);
 
         CommandResponse resp;
         do {
@@ -71,7 +74,7 @@ public final class PersonCollectionServer {
                 requestQueue.put(nextCommand);
                 runnerPool.execute(this::runNext);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("Thread interrupted while reading");
                 Thread.currentThread().interrupt();
             }
         }
@@ -83,7 +86,7 @@ public final class PersonCollectionServer {
                     serverToClientCommandRunner.run(requestQueue.take()));
             writterPool.submit(this::writeNext);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("Thread interrupted while running command");
             Thread.currentThread().interrupt();
         }
     }
@@ -92,7 +95,7 @@ public final class PersonCollectionServer {
         try {
             io.write(responseQueue.take());
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("Thread interrupted while sending response");
             Thread.currentThread().interrupt();
         }
     }
