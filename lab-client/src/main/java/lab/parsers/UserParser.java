@@ -8,7 +8,7 @@ import lab.common.commands.datacommands.RegisterCommandFlags;
 import lab.common.commands.datacommands.RegisterUserConnection;
 import lab.common.commands.datacommands.User;
 import lab.common.io.IOManager;
-import lab.common.io.Writter;
+import lab.common.io.Writer;
 import lab.common.util.DataCommandExecuteRequest;
 
 public final class UserParser {
@@ -20,30 +20,30 @@ public final class UserParser {
         throw new UnsupportedOperationException();
     }
 
-    public static User readUser(Writter<String> writter, IOManager<String, CommandResponse> clientIO,
-            IOManager<CommandResponse, DataCommandExecuteRequest> toServerIO) {
+    public static User readUser(Writer<String> writer, IOManager<String, CommandResponse> clientIO,
+                                IOManager<CommandResponse, DataCommandExecuteRequest> toServerIO) {
 
         CommandResponse response = null;
         User user;
-        IOManager<String, String> stringIO = new IOManager<>(clientIO::read, writter);
+        IOManager<String, String> stringIO = new IOManager<>(clientIO::read, writer);
 
         do {
 
             if (Objects.nonNull(response) && response.hasPrintableResult()) {
-                writter.write(response.getMessage());
+                writer.write(response.getMessage());
             }
 
-            writter.write("Please enter L(ogin) to continue singing in or R(egister) to continue registration");
-            String loginOrRegister = DataReader.readValidString(new IOManager<>(clientIO::read, writter),
+            writer.write("Please enter L(ogin) to continue singing in or R(egister) to continue registration");
+            String loginOrRegister = DataReader.readValidString(new IOManager<>(clientIO::read, writer),
                     (x -> x.matches("([Ll](ogin)?)|([Rr](egister)?)")),
                     "Please enter L(ogin) to continue singing in or R(egister) to continue registration");
 
-            writter.write("Enter username:");
+            writer.write("Enter username:");
             String username = DataReader.readValidString(stringIO, x -> x.length() <= MAX_USERNAME_LEN,
-                    String.format("Username lenght must be less than or equal to %d", MAX_USERNAME_LEN));
-            writter.write("Enter password:");
+                    String.format("Username length must be less than or equal to %d", MAX_USERNAME_LEN));
+            writer.write("Enter password:");
             String password = DataReader.readValidString(stringIO, x -> x.length() <= MAX_PASSWORD_LEN,
-                    String.format("Password lenght must be less than or equal to %d", MAX_PASSWORD_LEN));
+                    String.format("Password length must be less than or equal to %d", MAX_PASSWORD_LEN));
 
             user = new User(username, password);
             DataCommandExecuteRequest request = new DataCommandExecuteRequest(user, RegisterUserConnection.class,
@@ -53,7 +53,7 @@ public final class UserParser {
             response = toServerIO.read();
 
         } while (response.getResult() != CommandResult.SUCCESS);
-        writter.write("Logged in successfully");
+        writer.write("Logged in successfully");
         return user;
     }
 

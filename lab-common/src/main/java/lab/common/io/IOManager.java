@@ -3,15 +3,15 @@ package lab.common.io;
 public class IOManager<R, W> {
 
     private Reader<R> reader;
-    private Writter<W> writter;
+    private Writer<W> writter;
 
     public IOManager() {
 
     }
 
-    public IOManager(Reader<R> reader, Writter<W> writter) {
+    public IOManager(Reader<R> reader, Writer<W> writer) {
         this.reader = reader;
-        this.writter = writter;
+        this.writter = writer;
     }
 
     public Reader<R> getReader() {
@@ -22,17 +22,17 @@ public class IOManager<R, W> {
         this.reader = reader;
     }
 
-    public Writter<W> getWritter() {
+    public Writer<W> getWriter() {
         return writter;
     }
 
-    public void setWritter(Writter<W> writter) {
-        this.writter = writter;
+    public void setWriter(Writer<W> writer) {
+        this.writter = writer;
     }
 
-    public void setIO(Reader<R> newReader, Writter<W> newWritter) {
+    public void setIO(Reader<R> newReader, Writer<W> newWriter) {
         this.setReader(newReader);
-        this.setWritter(newWritter);
+        this.setWriter(newWriter);
     }
 
     public void write(W message) {

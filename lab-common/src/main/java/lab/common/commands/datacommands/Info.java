@@ -17,16 +17,14 @@ public final class Info extends AbstractDataCommand {
     @Override
     public CommandResponse execute(User user, Object... args) {
         if (!executableInstance) {
-            return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
+            return new CommandResponse(CommandResult.ERROR, "Execute called on non executable instance");
         }
-        return new CommandResponse(CommandResult.SUCCESS, new StringBuilder()
-                .append("Collection type: ")
-                .append(getManager().getDataSourceType())
-                .append("\nInit date: ")
-                .append(getManager().getInitDate().toString())
-                .append("\nElement count: ")
-                .append(getManager().getAsCollection().size())
-                .toString());
+        return new CommandResponse(CommandResult.SUCCESS, "Collection type: " +
+                getManager().getDataSourceType() +
+                "\nInit date: " +
+                getManager().getInitDate().toString() +
+                "\nElement count: " +
+                getManager().getAsCollection().size());
     }
 
     @Override
@@ -40,7 +38,7 @@ public final class Info extends AbstractDataCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return true;
     }
 

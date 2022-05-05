@@ -8,9 +8,9 @@ public final class ValidityChecker {
 
     public static CommandResponse checkValidity(BasicCommand command, Object[] args) {
         if (!command.isExecutableInstance()) {
-            return new CommandResponse(CommandResult.ERROR, "Execute called onunexecutable instance");
+            return new CommandResponse(CommandResult.ERROR, "Execute called on non executable instance");
         }
-        if (!command.isVaildArgument(args)) {
+        if (!command.isValidArgument(args)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         return new CommandResponse(CommandResult.SUCCESS);

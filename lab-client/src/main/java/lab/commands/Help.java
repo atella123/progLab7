@@ -25,9 +25,9 @@ public final class Help extends AbstractCommand {
 
     @Override
     public CommandResponse execute(Object... args) {
-        CommandResponse validy = ValidityChecker.checkValidity(this, args);
-        if (validy.getResult() != CommandResult.SUCCESS) {
-            return validy;
+        CommandResponse validity = ValidityChecker.checkValidity(this, args);
+        if (validity.getResult() != CommandResult.SUCCESS) {
+            return validity;
         }
         return new CommandResponse(CommandResult.SUCCESS,
                 commandMaps.stream().flatMap(x -> x.values().stream()).map(BasicCommand::getMan)
@@ -45,7 +45,7 @@ public final class Help extends AbstractCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return true;
     }
 

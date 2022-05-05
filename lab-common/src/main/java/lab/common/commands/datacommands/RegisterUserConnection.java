@@ -21,9 +21,9 @@ public final class RegisterUserConnection extends AbstractDataCommand {
 
     @Override
     public CommandResponse execute(User user, Object... args) {
-        CommandResponse validy = ValidityChecker.checkValidity(this, args);
-        if (validy.getResult() != CommandResult.SUCCESS) {
-            return validy;
+        CommandResponse validity = ValidityChecker.checkValidity(this, args);
+        if (validity.getResult() != CommandResult.SUCCESS) {
+            return validity;
         }
         if (args[0] == RegisterCommandFlags.REGISTER) {
             if (userManager.isUsernameTaken(user)) {
@@ -37,7 +37,7 @@ public final class RegisterUserConnection extends AbstractDataCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return args.length > 0 && args[0] instanceof RegisterCommandFlags;
     }
 

@@ -17,7 +17,7 @@ public final class Show extends AbstractDataCommand {
     @Override
     public CommandResponse execute(User user, Object... args) {
         if (!executableInstance) {
-            return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
+            return new CommandResponse(CommandResult.ERROR, "Execute called on non executable instance");
         }
 
         return new CommandResponse(CommandResult.SUCCESS, "Person manager elements:",
@@ -35,7 +35,7 @@ public final class Show extends AbstractDataCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return true;
     }
 

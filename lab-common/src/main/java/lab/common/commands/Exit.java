@@ -21,7 +21,7 @@ public final class Exit extends AbstractCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return true;
     }
 

@@ -30,7 +30,7 @@ public final class PersonCollectionServer {
     private boolean stopped;
     private final ExecutorService runnerPool;
     private final BlockingQueue<ServerExecuteRequest> requestQueue;
-    private final ForkJoinPool writterPool;
+    private final ForkJoinPool writerPool;
     private final BlockingQueue<ServerResponse> responseQueue;
 
     public PersonCollectionServer(CommandRunner<String, CommandResponse> serverCommandRunner,
@@ -41,7 +41,7 @@ public final class PersonCollectionServer {
         this.readerPool = new ForkJoinPool();
         this.runnerPool = Executors.newFixedThreadPool(RUNNER_POOL_SIZE);
         this.requestQueue = new ArrayBlockingQueue<>(RUNNER_POOL_SIZE);
-        this.writterPool = new ForkJoinPool();
+        this.writerPool = new ForkJoinPool();
         this.responseQueue = new ArrayBlockingQueue<>(RUNNER_POOL_SIZE);
     }
 
@@ -80,7 +80,7 @@ public final class PersonCollectionServer {
         try {
             responseQueue.add(
                     serverToClientCommandRunner.run(requestQueue.take()));
-            writterPool.submit(this::writeNext);
+            writerPool.submit(this::writeNext);
         } catch (InterruptedException e) {
             LOGGER.error("Thread interrupted while running command");
             Thread.currentThread().interrupt();

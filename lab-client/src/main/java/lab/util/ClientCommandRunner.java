@@ -59,11 +59,11 @@ public class ClientCommandRunner extends AbstractStringCommandRunner
 
     @Override
     public String[] parseArgumentsFromString(String arg) {
-        String[] splittedString = arg.trim().split("\\s+");
+        String[] split = arg.trim().split("\\s+");
         if (parseCommand(arg) != requestCommand) {
-            splittedString = Arrays.copyOfRange(splittedString, 1, splittedString.length);
+            split = Arrays.copyOfRange(split, 1, split.length);
         }
-        return splittedString;
+        return split;
     }
 
     private void updateHistory(String update) {

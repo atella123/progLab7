@@ -167,7 +167,7 @@ public final class Person implements Comparable<Person>, Serializable {
 
     public static class Builder {
 
-        private Person person;
+        private final Person person;
 
         public Builder() {
             this.person = new Person();
@@ -179,8 +179,6 @@ public final class Person implements Comparable<Person>, Serializable {
             this.person.name = person.name;
             this.person.coordinates = person.coordinates;
             this.person.creationDate = person.creationDate;
-            this.person.height = person.height;
-            this.person.passportID = person.passportID;
             this.person.height = person.height;
             this.person.passportID = person.passportID;
             this.person.eyeColor = person.eyeColor;

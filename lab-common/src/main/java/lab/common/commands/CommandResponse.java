@@ -12,14 +12,14 @@ public class CommandResponse implements Serializable {
             .compareTo(p2.getName());
     private final boolean printableResult;
     private final String message;
-    private final CommandResult comandResult;
+    private final CommandResult commandResult;
     private final boolean collectionToPrint;
     private final Person[] collectionResult;
 
     public CommandResponse(CommandResult result) {
         this.printableResult = false;
         this.message = null;
-        this.comandResult = result;
+        this.commandResult = result;
         this.collectionToPrint = false;
         this.collectionResult = null;
     }
@@ -27,7 +27,7 @@ public class CommandResponse implements Serializable {
     public CommandResponse(CommandResult result, Person[] collectionResult) {
         this.printableResult = false;
         this.message = null;
-        this.comandResult = result;
+        this.commandResult = result;
         if (Objects.nonNull(collectionResult) && collectionResult.length != 0) {
             this.collectionToPrint = true;
             Arrays.sort(collectionResult, ALPHABETICAL_COMPARATOR);
@@ -41,7 +41,7 @@ public class CommandResponse implements Serializable {
     public CommandResponse(CommandResult result, String message) {
         this.printableResult = Objects.nonNull(message) && !message.isEmpty();
         this.message = message;
-        this.comandResult = result;
+        this.commandResult = result;
         this.collectionToPrint = false;
         this.collectionResult = null;
     }
@@ -49,7 +49,7 @@ public class CommandResponse implements Serializable {
     public CommandResponse(CommandResult result, String message, Person[] collectionResult) {
         this.printableResult = Objects.nonNull(message) && !message.isEmpty();
         this.message = message;
-        this.comandResult = result;
+        this.commandResult = result;
         if (Objects.nonNull(collectionResult) && collectionResult.length != 0) {
             this.collectionToPrint = true;
             Arrays.sort(collectionResult, ALPHABETICAL_COMPARATOR);
@@ -69,7 +69,7 @@ public class CommandResponse implements Serializable {
     }
 
     public CommandResult getResult() {
-        return comandResult;
+        return commandResult;
     }
 
     public boolean hasCollectionToPrint() {
@@ -88,7 +88,7 @@ public class CommandResponse implements Serializable {
         int result = 1;
         result = prime * result + Arrays.hashCode(collectionResult);
         result = prime * result + (collectionToPrint ? n1 : n2);
-        result = prime * result + ((comandResult == null) ? 0 : comandResult.hashCode());
+        result = prime * result + ((commandResult == null) ? 0 : commandResult.hashCode());
         result = prime * result + ((message == null) ? 0 : message.hashCode());
         result = prime * result + (printableResult ? n1 : n2);
         return result;
@@ -112,7 +112,7 @@ public class CommandResponse implements Serializable {
         if (collectionToPrint != other.collectionToPrint) {
             return false;
         }
-        if (comandResult != other.comandResult) {
+        if (commandResult != other.commandResult) {
             return false;
         }
         if (message == null) {

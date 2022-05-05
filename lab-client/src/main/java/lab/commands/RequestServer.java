@@ -32,15 +32,15 @@ public final class RequestServer extends AbstractCommand {
     @Override
     public CommandResponse execute(Object... args) {
         if (!isExecutableInstance()) {
-            return new CommandResponse(CommandResult.ERROR, "Execute called onunexecutable instance");
+            return new CommandResponse(CommandResult.ERROR, "Execute called on non executable instance");
         }
-        if (!isVaildArgument(args)) {
+        if (!isValidArgument(args)) {
             return new CommandResponse(CommandResult.ERROR, "Unknown command");
         }
         DataCommand command = (DataCommand) args[0];
         Object[] parsedArgs = argumentParser.parseArguments(command,
                 Arrays.copyOfRange(args, 1, args.length, String[].class));
-        if (!command.isVaildArgument(parsedArgs)) {
+        if (!command.isValidArgument(parsedArgs)) {
             return new CommandResponse(CommandResult.ERROR, "Illegal argument");
         }
         DataCommandExecuteRequest commandWithArguments = new DataCommandExecuteRequest(user, command.getClass(),
@@ -50,7 +50,7 @@ public final class RequestServer extends AbstractCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return args.length > 0 && commandsMap.containsValue(args[0]);
     }
 

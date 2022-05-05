@@ -36,7 +36,7 @@ public class ServerToClientCommandRunner implements CommandRunner<ServerExecuteR
         if (Objects.isNull(command)) {
             return new ServerResponse(CommandResult.ERROR, "Unknown command", request.getClientAddress());
         }
-        return new ServerResponse(command.execute(request.getUser(), request.getArgumnets()),
+        return new ServerResponse(command.execute(request.getUser(), request.getArguments()),
                 request.getClientAddress());
     }
 

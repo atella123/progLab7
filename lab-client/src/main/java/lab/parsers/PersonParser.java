@@ -47,7 +47,7 @@ public final class PersonParser {
     public static String parsePassportID(IOManager<String, String> io) {
         io.write("Enter person passportID");
         return DataReader.readValidString(io, Person.Validator::isValidPassportID,
-                "passportID has min lenght (10)");
+                "passportID has min length (10)");
     }
 
     public static Color parseEyeColor(IOManager<String, String> io) {

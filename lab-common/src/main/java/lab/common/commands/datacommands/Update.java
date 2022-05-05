@@ -19,9 +19,9 @@ public final class Update extends AbstractDataCommand {
 
     @Override
     public CommandResponse execute(User user, Object... args) {
-        CommandResponse validy = ValidityChecker.checkValidity(this, args);
-        if (validy.getResult() != CommandResult.SUCCESS) {
-            return validy;
+        CommandResponse validity = ValidityChecker.checkValidity(this, args);
+        if (validity.getResult() != CommandResult.SUCCESS) {
+            return validity;
         }
         Integer id = (Integer) args[0];
         Optional<Person> personToUpdate = getManager().getByID(id);
@@ -47,7 +47,7 @@ public final class Update extends AbstractDataCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         if (args.length < 2) {
             return false;
         }

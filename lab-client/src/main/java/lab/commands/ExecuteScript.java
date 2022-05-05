@@ -31,9 +31,9 @@ public final class ExecuteScript extends AbstractCommand {
 
     @Override
     public CommandResponse execute(Object... args) {
-        CommandResponse validy = ValidityChecker.checkValidity(this, args);
-        if (validy.getResult() != CommandResult.SUCCESS) {
-            return validy;
+        CommandResponse validity = ValidityChecker.checkValidity(this, args);
+        if (validity.getResult() != CommandResult.SUCCESS) {
+            return validity;
         }
         File file = (File) args[0];
         if (!bannedFiles.contains(file)) {
@@ -108,7 +108,7 @@ public final class ExecuteScript extends AbstractCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return args.length > 0 && args[0] instanceof File;
     }
 

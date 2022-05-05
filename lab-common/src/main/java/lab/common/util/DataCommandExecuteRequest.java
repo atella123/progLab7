@@ -21,7 +21,7 @@ public class DataCommandExecuteRequest implements Serializable {
         return user;
     }
 
-    public Object[] getArgumnets() {
+    public Object[] getArguments() {
         return arguments;
     }
 

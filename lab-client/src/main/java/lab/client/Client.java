@@ -34,7 +34,7 @@ import lab.common.data.Location;
 import lab.common.data.Person;
 import lab.common.io.IOManager;
 import lab.common.io.Reader;
-import lab.common.io.Writter;
+import lab.common.io.Writer;
 import lab.common.util.ArgumentParser;
 import lab.parsers.CoordinatesParser;
 import lab.parsers.DataReader;
@@ -55,7 +55,7 @@ public final class Client {
             }
             return null;
         }, System.out::println);
-        InetSocketAddress serverAddress = getServerAdress(args, io::write);
+        InetSocketAddress serverAddress = getServerAddress(args, io::write);
         if (Objects.isNull(serverAddress)) {
             scanner.close();
             return;
@@ -63,12 +63,12 @@ public final class Client {
         try {
             createCommandRunner(serverAddress, io).run();
         } catch (SocketException e) {
-            io.write("Socket couldn't be binded");
+            io.write("Socket couldn't be bound");
         }
         scanner.close();
     }
 
-    public static ClientCommandRunner createCommandRunner(InetSocketAddress serverAdress,
+    public static ClientCommandRunner createCommandRunner(InetSocketAddress serverAddress,
             IOManager<String, ?> io)
             throws SocketException {
         Map<String, Command> clientCommandsMap = new HashMap<>();
@@ -86,7 +86,7 @@ public final class Client {
                 });
         Map<String, DataCommand> serverCommandsMap = createServerCommandsMap();
         ClientCommandRunner runner = new ClientCommandRunner(clientCommandsMap, serverCommandsMap,
-                argumentParser, serverAdress, commandRunnerIO);
+                argumentParser, serverAddress, commandRunnerIO);
         updateArgumentParser(argumentParser, serverCommandsMap, io::read);
         clientCommandsMap.putAll(createCommands(runner, serverCommandsMap));
         return runner;
@@ -129,7 +129,7 @@ public final class Client {
         return o.toString();
     }
 
-    public static InetSocketAddress getServerAdress(String[] args, Writter<String> writter) {
+    public static InetSocketAddress getServerAddress(String[] args, Writer<String> writter) {
         final int maxPort = 65535;
         final int minPort = 1;
         final int defaultPort = 1234;

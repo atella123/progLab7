@@ -92,11 +92,12 @@ public final class DataReader {
         String s;
         while (true) {
             EnumUtil.printEnumValuesWithIndexes(io, enumClass);
-            s = readString(io).toUpperCase();
+            s = readString(io);
             if (Objects.isNull(s)) {
                 io.write("Can't get value from empty string");
                 continue;
             }
+            s = s.toUpperCase();
             if (s.matches("\\d+")) {
                 int index = Integer.parseInt(s) - 1;
                 if (index > -1 && EnumUtil.enumValuesCount(enumClass) > index) {

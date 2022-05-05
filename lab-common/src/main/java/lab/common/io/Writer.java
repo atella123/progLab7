@@ -1,6 +1,6 @@
 package lab.common.io;
 
 @FunctionalInterface
-public interface Writter<T> {
+public interface Writer<T> {
     void write(T message);
 }

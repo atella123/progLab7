@@ -10,7 +10,7 @@ public class ServerExecuteRequest extends DataCommandExecuteRequest {
 
     public ServerExecuteRequest(DataCommandExecuteRequest request,
             SocketAddress clientAddress) {
-        super(request.getUser(), request.getCommandClass(), request.getArgumnets());
+        super(request.getUser(), request.getCommandClass(), request.getArguments());
         this.clientAddress = clientAddress;
     }
 

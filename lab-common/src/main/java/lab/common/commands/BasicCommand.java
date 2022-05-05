@@ -4,7 +4,7 @@ public interface BasicCommand {
 
     String getMan();
 
-    boolean isVaildArgument(Object... args);
+    boolean isValidArgument(Object... args);
 
     Class<?>[] getArgumentClasses();
 

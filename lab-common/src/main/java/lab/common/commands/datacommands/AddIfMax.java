@@ -17,9 +17,9 @@ public final class AddIfMax extends AbstractDataCommand {
 
     @Override
     public CommandResponse execute(User user, Object... args) {
-        CommandResponse validy = ValidityChecker.checkValidity(this, args);
-        if (validy.getResult() != CommandResult.SUCCESS) {
-            return validy;
+        CommandResponse validity = ValidityChecker.checkValidity(this, args);
+        if (validity.getResult() != CommandResult.SUCCESS) {
+            return validity;
         }
         Person p = (Person) args[0];
         DataManagerResponse dataManagerResponse = getManager()
@@ -41,7 +41,7 @@ public final class AddIfMax extends AbstractDataCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return args.length > 0 && args[0] instanceof Person;
     }
 

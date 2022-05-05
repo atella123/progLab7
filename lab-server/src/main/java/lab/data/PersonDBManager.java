@@ -58,8 +58,8 @@ public final class PersonDBManager implements OwnedDataManager<Person> {
     private static final String INVALID_USER_MESSAGE = "Invalid username or password";
 
     private static final int NAME_INDEX = 1;
-    private static final int COORD_X_INDEX = 2;
-    private static final int COORD_Y_INDEX = 3;
+    private static final int COORDINATES_X_INDEX = 2;
+    private static final int COORDINATES_Y_INDEX = 3;
     private static final int CREATION_DATE_INDEX = 4;
     private static final int HEIGHT_INDEX = 5;
     private static final int PASSPORT_ID_INDEX = 6;
@@ -210,7 +210,7 @@ public final class PersonDBManager implements OwnedDataManager<Person> {
     public DataManagerResponse add(User user, Person person) {
 
         if (!userManager.isRegisteredUser(user)) {
-            return new DataManagerResponse(false, "Couldn't add person to DB, user doens't exist");
+            return new DataManagerResponse(false, "Couldn't add person to DB, user doesn't exist");
         }
 
         try (Statement statement = connection.createStatement();
@@ -222,8 +222,8 @@ public final class PersonDBManager implements OwnedDataManager<Person> {
             insertStatement.setInt(ID_INDEX, result.getInt(1));
             insertStatement.setString(NAME_INDEX, person.getName());
             insertStatement.setString(OWNER_NAME_INDEX, user.getUsername());
-            insertStatement.setFloat(COORD_X_INDEX, person.getCoordinates().getX());
-            insertStatement.setInt(COORD_Y_INDEX, person.getCoordinates().getY());
+            insertStatement.setFloat(COORDINATES_X_INDEX, person.getCoordinates().getX());
+            insertStatement.setInt(COORDINATES_Y_INDEX, person.getCoordinates().getY());
             insertStatement.setDate(CREATION_DATE_INDEX, Date.valueOf(person.getCreationDate()));
             insertStatement.setInt(HEIGHT_INDEX, person.getHeight());
             insertStatement.setString(PASSPORT_ID_INDEX, person.getPassportID());
@@ -285,7 +285,7 @@ public final class PersonDBManager implements OwnedDataManager<Person> {
             }
         } catch (SQLException e) {
             LOGGER.error("Failed to delete person: {}", e.getMessage());
-            return new DataManagerResponse(false, "An error occured when trying to delete person");
+            return new DataManagerResponse(false, "An error occurred when trying to delete person");
         } finally {
             lock.unlock();
         }
@@ -330,8 +330,8 @@ public final class PersonDBManager implements OwnedDataManager<Person> {
         try (PreparedStatement statement = connection.prepareStatement(PREPARED_UPDATE_QUERY)) {
 
             statement.setString(NAME_INDEX, person.getName());
-            statement.setFloat(COORD_X_INDEX, person.getCoordinates().getX());
-            statement.setInt(COORD_Y_INDEX, person.getCoordinates().getY());
+            statement.setFloat(COORDINATES_X_INDEX, person.getCoordinates().getX());
+            statement.setInt(COORDINATES_Y_INDEX, person.getCoordinates().getY());
             statement.setDate(CREATION_DATE_INDEX, Date.valueOf(person.getCreationDate()));
             statement.setInt(HEIGHT_INDEX, person.getHeight());
             statement.setString(PASSPORT_ID_INDEX, person.getPassportID());
@@ -351,7 +351,7 @@ public final class PersonDBManager implements OwnedDataManager<Person> {
             return new DataManagerResponse();
         } catch (SQLException e) {
             LOGGER.error("Failed to update person: {}", e.getMessage());
-            return new DataManagerResponse(false, "An error occured when trying to update person");
+            return new DataManagerResponse(false, "An error occurred when trying to update person");
         }
     }
 
@@ -379,7 +379,7 @@ public final class PersonDBManager implements OwnedDataManager<Person> {
 
         } catch (SQLException e) {
             LOGGER.error("Failed to delete person: {}", e.getMessage());
-            return new DataManagerResponse(false, "An error occured when trying to delete person");
+            return new DataManagerResponse(false, "An error occurred when trying to delete person");
         }
         return new DataManagerResponse();
     }

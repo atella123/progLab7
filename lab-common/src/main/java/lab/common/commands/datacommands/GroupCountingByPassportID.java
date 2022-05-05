@@ -20,7 +20,7 @@ public final class GroupCountingByPassportID extends AbstractDataCommand {
     @Override
     public CommandResponse execute(User user, Object... args) {
         if (!executableInstance) {
-            return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
+            return new CommandResponse(CommandResult.ERROR, "Execute called on non nexecutable instance");
         }
         Map<String, Long> groupCounting = getManager().getAsCollection().stream()
                 .collect(Collectors.groupingBy(Person::getPassportID, Collectors.counting()));
@@ -41,7 +41,7 @@ public final class GroupCountingByPassportID extends AbstractDataCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return true;
     }
 

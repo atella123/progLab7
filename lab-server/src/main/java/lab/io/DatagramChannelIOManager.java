@@ -30,7 +30,7 @@ public class DatagramChannelIOManager extends IOManager<ServerExecuteRequest, Se
         datagramChannel.bind(new InetSocketAddress(port));
         datagramChannel.configureBlocking(true);
         setReader(this::readCommandWithArgs);
-        setWritter(this::writeResponse);
+        setWriter(this::writeResponse);
     }
 
     public DatagramChannelIOManager(int port, boolean blocking) throws IOException {
@@ -38,7 +38,7 @@ public class DatagramChannelIOManager extends IOManager<ServerExecuteRequest, Se
         datagramChannel.bind(new InetSocketAddress(port));
         datagramChannel.configureBlocking(blocking);
         setReader(this::readCommandWithArgs);
-        setWritter(this::writeResponse);
+        setWriter(this::writeResponse);
     }
 
     private ServerExecuteRequest readCommandWithArgs() {
@@ -52,7 +52,7 @@ public class DatagramChannelIOManager extends IOManager<ServerExecuteRequest, Se
                     new ByteArrayInputStream(inputPackages.array()));
             DataCommandExecuteRequest input = (DataCommandExecuteRequest) objectInputStream.readObject();
             if (Objects.nonNull(input)) {
-                LOGGER.info("New client request recivied from {} to execute {} command", remoteAddress,
+                LOGGER.info("New client request received from {} to execute {} command", remoteAddress,
                         input.getCommandClass().getSimpleName());
             }
             return new ServerExecuteRequest(input, remoteAddress);
@@ -86,12 +86,12 @@ public class DatagramChannelIOManager extends IOManager<ServerExecuteRequest, Se
         }
     }
 
-    private void writeNextDatagram(ByteBuffer byteBuffer, SocketAddress remoteAdress) {
-        while (byteBuffer.hasRemaining() && Objects.nonNull(remoteAdress)) {
+    private void writeNextDatagram(ByteBuffer byteBuffer, SocketAddress remoteAddress) {
+        while (byteBuffer.hasRemaining() && Objects.nonNull(remoteAddress)) {
             try {
-                datagramChannel.send(byteBuffer, remoteAdress);
+                datagramChannel.send(byteBuffer, remoteAddress);
             } catch (IOException e) {
-                LOGGER.error("An error occured when sending response: {}", e.getMessage());
+                LOGGER.error("An error occurred when sending response: {}", e.getMessage());
             }
         }
     }

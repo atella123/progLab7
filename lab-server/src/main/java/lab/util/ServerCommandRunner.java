@@ -36,8 +36,8 @@ public class ServerCommandRunner extends AbstractStringCommandRunner {
 
     @Override
     public String[] parseArgumentsFromString(String arg) {
-        String[] splittedString = arg.trim().split("\\s+");
-        return Arrays.copyOfRange(splittedString, 1, splittedString.length);
+        String[] splitString = arg.trim().split("\\s+");
+        return Arrays.copyOfRange(splitString, 1, splitString.length);
     }
 
 }

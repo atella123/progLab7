@@ -17,7 +17,7 @@ public final class Clear extends AbstractDataCommand {
     @Override
     public CommandResponse execute(User user, Object... args) {
         if (!executableInstance) {
-            return new CommandResponse(CommandResult.ERROR, "Execute called on unexecutable instance");
+            return new CommandResponse(CommandResult.ERROR, "Execute called on non executable instance");
         }
         DataManagerResponse dataManagerResponse = getManager().clear(user);
         if (!dataManagerResponse.isSuccess()) {
@@ -36,7 +36,7 @@ public final class Clear extends AbstractDataCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return true;
     }
 

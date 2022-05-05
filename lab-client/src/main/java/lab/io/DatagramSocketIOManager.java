@@ -27,7 +27,7 @@ public class DatagramSocketIOManager extends IOManager<CommandResponse, DataComm
         this.serverAddress = serverAddress;
         setupNewSocket();
         setReader(this::readResponse);
-        setWritter(this::writeCommandWithArgs);
+        setWriter(this::writeCommandWithArgs);
     }
 
     private void setupNewSocket() throws SocketException {

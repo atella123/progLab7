@@ -1,4 +1,4 @@
-package lab.exceptions;
+package lab.commands.exceptions;
 
 public class StringIsNullException extends RuntimeException {
 

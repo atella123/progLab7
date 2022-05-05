@@ -23,9 +23,9 @@ public final class History extends AbstractCommand {
 
     @Override
     public CommandResponse execute(Object... args) {
-        CommandResponse validy = ValidityChecker.checkValidity(this, args);
-        if (validy.getResult() != CommandResult.SUCCESS) {
-            return validy;
+        CommandResponse validity = ValidityChecker.checkValidity(this, args);
+        if (validity.getResult() != CommandResult.SUCCESS) {
+            return validity;
         }
         return new CommandResponse(CommandResult.SUCCESS,
                 commandRunner.getHistory().stream().map(Object::toString).collect(Collectors.joining("\n")));
@@ -42,7 +42,7 @@ public final class History extends AbstractCommand {
     }
 
     @Override
-    public boolean isVaildArgument(Object... args) {
+    public boolean isValidArgument(Object... args) {
         return true;
     }
 
