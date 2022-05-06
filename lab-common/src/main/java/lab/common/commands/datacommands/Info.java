@@ -19,12 +19,12 @@ public final class Info extends AbstractDataCommand {
         if (!executableInstance) {
             return new CommandResponse(CommandResult.ERROR, "Execute called on non executable instance");
         }
-        return new CommandResponse(CommandResult.SUCCESS, "Collection type: " +
-                getManager().getDataSourceType() +
-                "\nInit date: " +
-                getManager().getInitDate().toString() +
-                "\nElement count: " +
-                getManager().getAsCollection().size());
+        return new CommandResponse(CommandResult.SUCCESS, "Collection type: "
+                + getManager().getDataSourceType()
+                + "\nInit date: "
+                + getManager().getInitDate().toString()
+                + "\nElement count: "
+                + getManager().getAsCollection().size());
     }
 
     @Override
