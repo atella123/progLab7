@@ -1,6 +1,5 @@
 package lab.data;
 
-import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -77,34 +76,23 @@ public final class PersonDBManager implements OwnedDataManager<Person> {
     private final LocalDate timestamp = LocalDate.now();
     private final Lock lock = new ReentrantLock();
 
-    public PersonDBManager(Connection connection, MessageDigest hashFunction) throws SQLException {
+    public PersonDBManager(Connection connection) throws SQLException {
         this.connection = connection;
-        this.userManager = new UserDBManager(connection, hashFunction);
+        this.userManager = new UserDBManager(connection);
         this.collectionManager = new PersonCollectionManager();
-        createTable();
-        setCollectionFromDB();
     }
 
-    public PersonDBManager(String url, String user, String password, MessageDigest hashFunction) throws SQLException {
+    public PersonDBManager(String url, String user, String password) throws SQLException {
         this.connection = DriverManager.getConnection(url, user, password);
-        this.userManager = new UserDBManager(connection, hashFunction);
+        this.userManager = new UserDBManager(connection);
         this.collectionManager = new PersonCollectionManager();
-        createTable();
-        setCollectionFromDB();
     }
 
-    public PersonDBManager(String[] properties, MessageDigest hashFunction) throws SQLException {
-        this.connection = DriverManager.getConnection(properties[0], properties[1], properties[2]);
-        this.userManager = new UserDBManager(connection, hashFunction);
-        this.collectionManager = new PersonCollectionManager();
-        createTable();
-        setCollectionFromDB();
-    }
-
-    private void createTable() throws SQLException {
+    public void initTable() throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.execute(INIT_TABLE_QUERY);
         }
+        setCollectionFromDB();
     }
 
     private void setCollectionFromDB() throws SQLException {

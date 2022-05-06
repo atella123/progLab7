@@ -1,22 +1,19 @@
 package lab.data;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import lab.common.commands.datacommands.User;
 import lab.common.util.UserManager;
-
-import java.security.MessageDigest;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import lab.util.MessageDigestHasher;
 
 public final class UserDBManager implements UserManager {
 
@@ -26,21 +23,17 @@ public final class UserDBManager implements UserManager {
             + "name VARCHAR(30) PRIMARY KEY,"
             + "password bytea NOT NULL);";
 
-    private final Lock lock = new ReentrantLock();
     private final Connection connection;
-    private final MessageDigest hashFunction;
 
-    public UserDBManager(Connection connection, MessageDigest hashFunction)
+    public UserDBManager(Connection connection)
             throws SQLException {
         this.connection = connection;
-        this.hashFunction = hashFunction;
         createTable();
     }
 
-    public UserDBManager(String url, String user, String password, MessageDigest hashFunction)
+    public UserDBManager(String url, String user, String password)
             throws SQLException {
         this.connection = DriverManager.getConnection(url, user, password);
-        this.hashFunction = hashFunction;
         createTable();
     }
 
@@ -55,12 +48,9 @@ public final class UserDBManager implements UserManager {
         try (PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO users(name, password) VALUES (?, ?);")) {
 
-            lock.lock();
-            hashFunction.update(user.getPassword().getBytes());
             int i = 1;
             statement.setString(i++, user.getUsername());
-            statement.setBytes(i, hashFunction.digest());
-            lock.unlock();
+            statement.setBytes(i, MessageDigestHasher.getHashFromBytes(user.getPassword().getBytes()));
 
             statement.execute();
 
@@ -121,12 +111,8 @@ public final class UserDBManager implements UserManager {
         try (PreparedStatement statement = connection.prepareStatement(
                 "SELECT EXISTS(SELECT 1 FROM users WHERE name = ? AND password = ?);")) {
 
-            lock.lock();
-            hashFunction.update(user.getPassword().getBytes());
-
             statement.setString(1, user.getUsername());
-            statement.setBytes(2, hashFunction.digest());
-            lock.unlock();
+            statement.setBytes(2, MessageDigestHasher.getHashFromBytes(user.getPassword().getBytes()));
 
             statement.execute();
 
@@ -156,14 +142,8 @@ public final class UserDBManager implements UserManager {
                 return false;
             }
 
-            try {
-                lock.lock();
-                hashFunction.update(user.getPassword().getBytes());
-                return Arrays.equals(hashFunction.digest(), result.getBytes(1));
-            } finally {
-                lock.unlock();
-            }
-
+            return Arrays.equals(MessageDigestHasher.getHashFromBytes(user.getPassword().getBytes()),
+                    result.getBytes(1));
         } catch (SQLException e) {
             LOGGER.error("Reading user failed: {}", e.getMessage());
             return false;

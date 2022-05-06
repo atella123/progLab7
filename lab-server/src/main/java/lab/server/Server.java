@@ -1,8 +1,6 @@
 package lab.server;
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,14 +53,14 @@ public final class Server {
             return;
         }
 
-        PersonDBManager manager = createDBManager(dbProperties, "MD2");
         DatagramChannelIOManager clientIOManager = createDatagramChannelIOManager(port);
 
-        if (Objects.isNull(manager) || Objects.isNull(clientIOManager)) {
+        if (Objects.isNull(clientIOManager)) {
             return;
         }
 
         Scanner scanner = new Scanner(System.in);
+        PersonDBManager manager = createDBManager(dbProperties);
         Map<String, Command> serverCommandsMap = createServerCommandsMap();
         CommandRunner<String, CommandResponse> serverCommandRunner = new ServerCommandRunner(new ArgumentParser<>(),
                 serverCommandsMap, createServerIOManager(scanner));
@@ -82,15 +80,15 @@ public final class Server {
         scanner.close();
     }
 
-    public static PersonDBManager createDBManager(String[] properties, String messageDigest) {
+    public static PersonDBManager createDBManager(String[] properties) {
         try {
-            return new PersonDBManager(properties, MessageDigest.getInstance(messageDigest));
+            PersonDBManager manager = new PersonDBManager(properties[0], properties[1], properties[2]);
+            manager.initTable();
+            return manager;
         } catch (SQLException e) {
             LOGGER.error("Couldn't connect to DB: {}", e.getMessage());
-        } catch (NoSuchAlgorithmException e) {
-            LOGGER.error(e);
+            return null;
         }
-        return null;
     }
 
     public static DatagramChannelIOManager createDatagramChannelIOManager(int port) {
