@@ -60,18 +60,20 @@ public final class PersonCollectionServer {
     }
 
     private void startReaders() {
-        while (!stopped && readerPool.getQueuedTaskCount() < READER_POOL_SIZE) {
+        for (int i = 0; i < READER_POOL_SIZE; i++) {
             readerPool.submit(this::readNext);
         }
     }
 
     private void readNext() {
-        try {
-            requestQueue.put(io.read());
-            runnerPool.execute(this::runNext);
-        } catch (InterruptedException e) {
-            LOGGER.error("Thread interrupted while reading");
-            Thread.currentThread().interrupt();
+        while (!stopped) {
+            try {
+                requestQueue.put(io.read());
+                runnerPool.execute(this::runNext);
+            } catch (InterruptedException e) {
+                LOGGER.error("Thread interrupted while reading");
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
