@@ -332,6 +332,8 @@ public final class PersonDBManager implements OwnedDataManager<Person> {
 
             statement.execute();
 
+            person.setID(id);
+
             lock.lock();
             collectionManager.updateID(id, person);
             lock.unlock();

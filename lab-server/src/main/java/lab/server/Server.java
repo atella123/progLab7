@@ -59,8 +59,13 @@ public final class Server {
             return;
         }
 
-        Scanner scanner = new Scanner(System.in);
         PersonDBManager manager = createDBManager(dbProperties);
+
+        if (Objects.isNull(manager)) {
+            return;
+        }
+
+        Scanner scanner = new Scanner(System.in);
         Map<String, Command> serverCommandsMap = createServerCommandsMap();
         CommandRunner<String, CommandResponse> serverCommandRunner = new ServerCommandRunner(new ArgumentParser<>(),
                 serverCommandsMap, createServerIOManager(scanner));
